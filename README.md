@@ -1,1 +1,15 @@
-# project11a-mobile-the-seal-division
+# Книжный онлайн-магазин
+
+# Description
+Данный репозиторий содержит мобильное приложение "Книжный онлайн-магазин"
+
+# Installation
+
+# Sub modules
+
+# Usage
+
+# Contributing
+- Кремко Тимофей
+- Напреенко Станислав
+- Яшенок Алина
