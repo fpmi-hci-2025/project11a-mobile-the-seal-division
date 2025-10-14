@@ -5,7 +5,7 @@ ENV PATH ${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platfo
 
 RUN apt-get update && \
     apt-get install -y \
-        openjdk-11-jdk \
+        openjdk-17-jdk \
         wget \
         unzip \
         git \
