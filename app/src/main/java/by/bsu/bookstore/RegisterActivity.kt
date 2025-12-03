@@ -1,0 +1,36 @@
+package by.bsu.bookstore
+
+import android.os.Bundle
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+
+class RegisterActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_register)
+
+        val inputName = findViewById<TextInputEditText>(R.id.usernameEditText)
+        val inputEmail = findViewById<TextInputEditText>(R.id.emailEditText)
+        val inputPhone = findViewById<TextInputEditText>(R.id.phoneEditText)
+        val inputPass = findViewById<TextInputEditText>(R.id.passwordEditText)
+        val inputPass2 = findViewById<TextInputEditText>(R.id.confirmPasswordEditText)
+        val btnRegister = findViewById<MaterialButton>(R.id.registerButton)
+
+        btnRegister.setOnClickListener {
+            if (inputName.text?.isBlank() == true || inputEmail.text?.isBlank() == true || inputPass.text?.isBlank() == true) {
+                android.widget.Toast.makeText(this, "Заполните обязательные поля", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (inputPass.text.toString() != inputPass2.text.toString()) {
+                android.widget.Toast.makeText(this, "Пароли не совпадают", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            // Локальная заглушка — регистрация успешна
+            android.widget.Toast.makeText(this, "Регистрация прошла успешно", android.widget.Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Заголовок -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Предзаказ"
+            android:textSize="24sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="24dp"
+            android:gravity="center" />
+
+        <!-- Информация о книге -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/bookTitleTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Название книги"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_color"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/bookAuthorTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Автор"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_color"
+                     />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Поле email для уведомлений -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email для уведомлений"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Кнопка предзаказа -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/preorderButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Оформить предзаказ"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/primary_color"
+            android:layout_marginTop="24dp" />
+    </LinearLayout>
+</ScrollView>

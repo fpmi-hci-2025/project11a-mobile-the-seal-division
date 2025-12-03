@@ -2,14 +2,13 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="@color/background_color"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/allBooksTitle"
-        android:text="Все книги"
+        android:text="Заказы"
         android:textSize="28sp"
         android:textColor="@color/text_color"
         android:layout_width="wrap_content"
@@ -17,8 +16,7 @@
         android:layout_marginBottom="12dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/allBooksRecyclerView"
+        android:id="@+id/ordersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
 </LinearLayout>

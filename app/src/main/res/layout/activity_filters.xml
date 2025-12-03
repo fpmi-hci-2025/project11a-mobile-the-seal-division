@@ -1,10 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FiltersActivity">
+    android:background="@color/background_color"
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ЖАНРЫ -->
+        <TextView
+            android:text="Жанр"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/genreChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFiction"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Фантастика" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipClassic"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Классика" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDetective"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Детективы" />
+        </com.google.android.material.chip.ChipGroup>
+
+
+        <!-- АВТОРЫ -->
+        <TextView
+            android:text="Авторы"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/authorsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Булгаков"/>
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Оруэлл"/>
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Толстой"/>
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Достоевский"/>
+        </com.google.android.material.chip.ChipGroup>
+
+
+        <!-- ИЗДАТЕЛЬСТВА -->
+        <TextView
+            android:text="Издательства"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/publishersChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="АСТ"/>
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Эксмо"/>
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Питер"/>
+        </com.google.android.material.chip.ChipGroup>
+
+
+        <!-- Цена -->
+        <TextView
+            android:text="Цена"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/priceRangeSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="5000"
+            android:stepSize="100"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Рейтинг -->
+        <TextView
+            android:text="Минимальный рейтинг"
+            android:textSize="20sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <RatingBar
+            android:id="@+id/ratingFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            android:progressTint="@color/primary_color"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- КНОПКИ -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/applyFiltersButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Применить"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/primary_color"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/resetFiltersButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сбросить"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/secondary_color"/>
+
+    </LinearLayout>
+</ScrollView>
