@@ -1,9 +1,9 @@
 package by.bsu.bookstore
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -11,55 +11,57 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 
 class BooksCarouselAdapter(
-    private val books: List<Book>,
-    private val onBookClick: (Book) -> Unit
+    private val items: List<Book>,
+    private val onDetailsClick: (Book) -> Unit,
+    private val onFavoriteClick: (Book) -> Unit = {}
 ) : RecyclerView.Adapter<BooksCarouselAdapter.BookViewHolder>() {
 
-    class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val coverImage: ImageView = itemView.findViewById(R.id.bookCover)
-        val titleText: TextView = itemView.findViewById(R.id.bookTitle)
-        val authorText: TextView = itemView.findViewById(R.id.bookAuthor)
-        val ratingBar: RatingBar = itemView.findViewById(R.id.bookRating)
-        val buyButton: MaterialButton = itemView.findViewById(R.id.buyButton)
-        val favoriteButton: MaterialButton = itemView.findViewById(R.id.favoriteButton)
+    class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val cover: ImageView = view.findViewById(R.id.bookCover)
+        val title: TextView = view.findViewById(R.id.bookTitle)
+        val author: TextView = view.findViewById(R.id.bookAuthor)
+        val rating: RatingBar = view.findViewById(R.id.bookRating)
+        val price: TextView = view.findViewById(R.id.bookPrice)
+        val detailsButton: MaterialButton = view.findViewById(R.id.buyButton)
+        val favoriteButton: ImageButton = view.findViewById(R.id.favoriteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
-        val view = LayoutInflater.from(parent.context)
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_book_carousel, parent, false)
-        return BookViewHolder(view)
+        return BookViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        val book = books[position]
+        val book = items[position]
 
-        holder.titleText.text = book.title
-        holder.authorText.text = book.authors.joinToString(", ")
-        holder.ratingBar.rating = book.rating
-        holder.coverImage.setImageResource(book.coverResId ?: R.drawable.book_cover)
+        if (book.coverResId != null) holder.cover.setImageResource(book.coverResId)
+        else holder.cover.setImageResource(R.drawable.book_cover)
 
-        holder.itemView.setOnClickListener {
-            // открыть детали
-            holder.itemView.context.startActivity(
-                Intent(holder.itemView.context, BookDetailsActivity::class.java).apply {
-                    putExtra("book", book)
-                }
-            )
-        }
+        holder.title.text = book.title
+        holder.author.text = book.authors.joinToString(", ")
+        holder.rating.rating = book.rating
+        holder.price.text = String.format("%.2f BYN", book.price)
 
-        holder.buyButton.setOnClickListener {
-            CartManager.addToCart(book, 1)
-            // можно показать Snackbar или Toast
-            android.widget.Toast.makeText(holder.itemView.context, "Добавлено в корзину", android.widget.Toast.LENGTH_SHORT).show()
+        holder.detailsButton.text = "Подробнее"
+        holder.detailsButton.setOnClickListener {
+            onDetailsClick(book)
         }
 
         holder.favoriteButton.setOnClickListener {
-            FavoritesManager.toggleFavorite(holder.itemView.context, book)
-            val added = FavoritesManager.isFavorite(book)
-            holder.favoriteButton.iconTint = if (added) android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFFFFF")) else android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#7A6D58"))
-            android.widget.Toast.makeText(holder.itemView.context, if (added) "Добавлено в избранное" else "Удалено из избранного", android.widget.Toast.LENGTH_SHORT).show()
+            onFavoriteClick(book)
         }
+
+        val isFavorite = FavoritesManager.isFavorite(book)
+        holder.favoriteButton.setImageResource(
+            if (isFavorite) R.drawable.ic_bookmark else R.drawable.ic_bookmark
+        )
+        holder.favoriteButton.alpha = if (isFavorite) 1.0f else 0.5f
+
+        holder.itemView.alpha = 0f
+        holder.itemView.translationY = 8f
+        holder.itemView.animate().alpha(1f).translationY(0f).setDuration(220).start()
     }
 
-    override fun getItemCount() = books.size
+    override fun getItemCount(): Int = items.size
 }

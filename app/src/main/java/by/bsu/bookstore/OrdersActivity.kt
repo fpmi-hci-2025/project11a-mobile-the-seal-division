@@ -5,21 +5,19 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.repositories.OrdersRepository
 
-class OrdersActivity : AppCompatActivity() {
+class OrdersActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_orders)
-
+        inflateContent(R.layout.activity_orders)
+        //setupBottomNav(R.id.nav_profile)
         title = "Заказы"
 
         val rv = findViewById<RecyclerView>(R.id.ordersRecyclerView)
         rv.layoutManager = LinearLayoutManager(this)
-        // временные данные
-        val sample = listOf(
-            Order(1001, User(1, "Иван","Иванов","ivan@example.com"), listOf(OrderItem(Book(1,"1984", listOf("Дж. Оруэлл"), "A", 350.0))), 350.0, "новый", "ул. Ленина, 1"),
-            Order(1002, User(2, "Пётр","Петров","petrov@example.com"), listOf(OrderItem(Book(2,"Мастер и Маргарита", listOf("М. Булгаков"), "B", 500.0))), 500.0, "в обработке", "ул. Садовая, 5")
-        )
+
+        val sample = OrdersRepository.getAllOrders()
         rv.adapter = OrderAdapter(sample) { order, action ->
             // обработка: change status
         }

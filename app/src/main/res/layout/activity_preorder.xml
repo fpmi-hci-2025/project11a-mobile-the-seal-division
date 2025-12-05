@@ -21,12 +21,12 @@
             android:layout_marginBottom="24dp"
             android:gravity="center" />
 
-        <!-- Информация о книге -->
+        <!-- Карточка книги -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -50,12 +50,13 @@
                     android:layout_height="wrap_content"
                     android:text="Автор"
                     android:textSize="16sp"
-                    android:textColor="@color/text_color"
-                     />
+                    android:textColor="@color/text_color" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Поле email для уведомлений -->
+        <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,16 +72,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Кнопка предзаказа -->
+        <!-- Кнопка -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/preorderButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="24dp"
             android:text="Оформить предзаказ"
             android:textColor="@color/white"
-            app:backgroundTint="@color/primary_color"
-            android:layout_marginTop="24dp" />
+            app:backgroundTint="@color/primary_color" />
+
+        <include layout="@layout/bottom_navigation_included" />
+
     </LinearLayout>
+
 </ScrollView>

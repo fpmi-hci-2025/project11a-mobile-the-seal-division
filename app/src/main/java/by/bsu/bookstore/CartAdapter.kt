@@ -37,7 +37,7 @@ class CartAdapter(
 
         holder.cover.setImageResource(book.coverResId ?: R.drawable.book_cover)
         holder.title.text = book.title
-        holder.price.text = "%.2f ₽".format(book.price)
+        holder.price.text = "%.2f BYN".format(book.price)
         holder.quantity.text = item.quantity.toString()
 
         // Уменьшить количество
@@ -58,7 +58,7 @@ class CartAdapter(
 
         // Удалить
         holder.deleteButton.setOnClickListener {
-            CartManager.removeFromCart(book.bookId)
+            CartManager.removeFromCart(holder.itemView.context, book.bookId)
             items.removeAt(position)
             notifyItemRemoved(position)
             onItemRemoved()

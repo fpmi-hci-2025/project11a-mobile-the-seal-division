@@ -7,11 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
-class CheckoutActivity : AppCompatActivity() {
+class CheckoutActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_checkout)
+        inflateContent(R.layout.activity_checkout)
+        //setupBottomNav(R.id.nav_profile)
 
         val nameInput = findViewById<TextInputEditText>(R.id.cardNameEditText)
         val cardInput = findViewById<TextInputEditText>(R.id.cardNumberEditText)
@@ -36,7 +37,7 @@ class CheckoutActivity : AppCompatActivity() {
                 status = "оплачен",
                 address = addressInput.text.toString()
             )
-            CartManager.clear()
+            CartManager.clear(this)
             android.widget.Toast.makeText(this, "Оплата успешна. Сумма: ${"%.2f".format(total)} BYN", android.widget.Toast.LENGTH_LONG).show()
             finish()
         }

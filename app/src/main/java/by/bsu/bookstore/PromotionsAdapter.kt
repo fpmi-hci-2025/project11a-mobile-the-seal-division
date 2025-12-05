@@ -7,30 +7,34 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class PromotionsAdapter(
-    private val promotions: List<Promotion>,
-    private val onPromotionClick: (Promotion) -> Unit
-) : RecyclerView.Adapter<PromotionsAdapter.PromotionViewHolder>() {
+    private val items: List<Promotion>,
+    private val onClick: (Promotion) -> Unit
+) : RecyclerView.Adapter<PromotionsAdapter.PromoViewHolder>() {
 
-    class PromotionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val titleText: TextView = itemView.findViewById(R.id.promotionTitle)
-        val descriptionText: TextView = itemView.findViewById(R.id.promotionDescription)
+    class PromoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val title: TextView = view.findViewById(R.id.promotionTitle)
+        val shortText: TextView = view.findViewById(R.id.promotionDescription)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PromotionViewHolder {
-        val view = LayoutInflater.from(parent.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PromoViewHolder {
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_promotion, parent, false)
-        return PromotionViewHolder(view)
+        return PromoViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: PromotionViewHolder, position: Int) {
-        val promotion = promotions[position]
-        holder.titleText.text = promotion.title
-        holder.descriptionText.text = promotion.description
-
+    override fun onBindViewHolder(holder: PromoViewHolder, position: Int) {
+        val promo = items[position]
+        holder.title.text = promo.title
+        holder.shortText.text = promo.description
         holder.itemView.setOnClickListener {
-            onPromotionClick(promotion)
+            onClick(promo)
         }
+
+        // Simple appear animation
+        holder.itemView.alpha = 0f
+        holder.itemView.translationY = 8f
+        holder.itemView.animate().alpha(1f).translationY(0f).setDuration(220).start()
     }
 
-    override fun getItemCount() = promotions.size
+    override fun getItemCount(): Int = items.size
 }

@@ -1,102 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="16dp"
-    android:background="@color/background_color">
+    android:background="@color/background_color"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="Личный кабинет"
+        android:textSize="28sp"
+        android:textColor="@color/text_color"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
 
-        <!-- ПРОФИЛЬ -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            android:layout_marginBottom="24dp"
-            android:padding="16dp">
+    <TextView
+        android:id="@+id/profileUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Имя Фамилия"
+        android:textSize="20sp"
+        android:textColor="@color/text_color"
+        android:gravity="center" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/profileUserEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="email@mail.com"
+        android:textSize="16sp"
+        android:textColor="@color/secondary_color"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
 
-                <ImageView
-                    android:id="@+id/profileAvatar"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginEnd="16dp"/>
+    <LinearLayout
+        android:id="@+id/profileEditButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/profileName"
-                        android:text="Имя Фамилия"
-                        android:textStyle="bold"
-                        android:textSize="22sp"
-                        android:textColor="@color/text_color"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/profileEmail"
-                        android:text="email@example.com"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/text_color"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- КНОПКИ -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editProfileButton"
-                    android:text="Редактировать"
-                    android:textColor="@color/white"
-                    app:backgroundTint="@color/secondary_color"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/logoutButton"
-                    android:text="Выйти"
-                    android:textColor="@color/white"
-                    app:backgroundTint="@color/primary_color"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"/>
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- ИСТОРИЯ ЗАКАЗОВ -->
         <TextView
-            android:text="История заказов"
-            android:textSize="22sp"
-            android:textColor="@color/text_color"
-            android:layout_marginBottom="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/profileOrdersRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Редактировать профиль"
+            android:textSize="16sp"
+            android:textColor="@color/text_color" />
     </LinearLayout>
-</ScrollView>
+
+    <LinearLayout
+        android:id="@+id/profileNotificationsButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Уведомления"
+            android:textSize="16sp"
+            android:textColor="@color/text_color" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/profileEmptyOrders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="У вас пока нет заказов"
+        android:textSize="18sp"
+        android:textColor="@color/text_color"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="16dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profileOrdersRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:id="@+id/profileLoginButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Войти"
+            android:textSize="16sp"
+            android:textColor="@color/text_color" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/profileRegisterButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Регистрация"
+            android:textSize="16sp"
+            android:textColor="@color/text_color" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/profileLogoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Выйти"
+        android:backgroundTint="@color/secondary_color"
+        android:textColor="@color/white"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        android:layout_marginBottom="90dp"/>
+
+
+</LinearLayout>

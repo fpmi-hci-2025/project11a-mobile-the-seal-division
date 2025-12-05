@@ -1,17 +1,19 @@
 package by.bsu.bookstore
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import by.bsu.bookstore.repositories.UserRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
-
+        inflateContent(R.layout.activity_register)
+        //setupBottomNav(R.id.nav_profile)
         val inputName = findViewById<TextInputEditText>(R.id.usernameEditText)
         val inputEmail = findViewById<TextInputEditText>(R.id.emailEditText)
         val inputPhone = findViewById<TextInputEditText>(R.id.phoneEditText)
@@ -28,9 +30,18 @@ class RegisterActivity : AppCompatActivity() {
                 android.widget.Toast.makeText(this, "Пароли не совпадают", android.widget.Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // Локальная заглушка — регистрация успешна
-            android.widget.Toast.makeText(this, "Регистрация прошла успешно", android.widget.Toast.LENGTH_SHORT).show()
-            finish()
+            if (inputEmail.text.toString() !in UserRepository.getAllEmails()){
+                val email = inputEmail.text.toString()
+                UserRepository.createUser(User(UserRepository.getNewId(), inputName.text.toString(), "", email))
+                AuthManager.login(this, email)
+                android.widget.Toast.makeText(this, "Регистрация успешна! Вход выполнен как $email", android.widget.Toast.LENGTH_SHORT).show()
+                // TODO: при подключении API сохранить токен
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            else{
+                android.widget.Toast.makeText(this, "Пользователь с такой почтой уже существует!", android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

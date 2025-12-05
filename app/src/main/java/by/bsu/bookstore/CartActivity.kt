@@ -2,58 +2,100 @@ package by.bsu.bookstore
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 
-class CartActivity : AppCompatActivity() {
+class CartActivity : BaseActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var totalPriceText: TextView
-    private lateinit var checkoutButton: MaterialButton
+    private lateinit var recycler: RecyclerView
+    private lateinit var totalText: TextView
+    private lateinit var emptyText: TextView
+    private lateinit var checkoutButton: View
 
-    private lateinit var adapter: CartAdapter
+    private lateinit var adapter: CartItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_cart)
+        inflateContent(R.layout.activity_cart)
+        selectNavItem(R.id.nav_cart)
 
-        recyclerView = findViewById(R.id.cartRecyclerView)
-        totalPriceText = findViewById(R.id.cartTotalPrice)
+        recycler = findViewById(R.id.cartRecyclerView)
+        totalText = findViewById(R.id.cartTotalPrice)
+        emptyText = findViewById(R.id.cartEmptyText)
         checkoutButton = findViewById(R.id.cartCheckoutButton)
-
-        adapter = CartAdapter(
-            items = CartManager.getItems().toMutableList(),
-            onQuantityChanged = { updateTotal() },
-            onItemRemoved = {
-                updateTotal()
-                refreshList()
-            }
-        )
-
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
-
-        updateTotal()
+        recycler.layoutManager = LinearLayoutManager(this)
+        setupAdapter()
+        updateUI()
 
         checkoutButton.setOnClickListener {
-            if (CartManager.getItems().isEmpty()) {
-                android.widget.Toast.makeText(this, "Корзина пуста", android.widget.Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
             startActivity(Intent(this, CheckoutActivity::class.java))
         }
     }
 
-    private fun refreshList() {
-        adapter.items = CartManager.getItems().toMutableList()
-        adapter.notifyDataSetChanged()
+    private fun setupAdapter() {
+        // Получаем актуальные данные из CartManager
+        val items = CartManager.getItems().map { CartItem(it.book, it.quantity) }.toMutableList()
+
+        adapter = CartItemAdapter(
+            items = items,
+            onIncrease = { cartItem ->
+                // Обновляем количество в CartManager
+                CartManager.addToCart(this, cartItem.book, 1)
+                refreshData()
+            },
+            onDecrease = { cartItem ->
+                if (cartItem.quantity > 1) {
+                    // Уменьшаем количество
+                    CartManager.removeFromCart(this, cartItem.book.bookId)
+                    CartManager.addToCart(this, cartItem.book, cartItem.quantity - 1)
+                } else {
+                    // Удаляем товар
+                    CartManager.removeFromCart(this, cartItem.book.bookId)
+                }
+                refreshData()
+            },
+            onDelete = { cartItem ->
+                CartManager.removeFromCart(this, cartItem.book.bookId)
+                refreshData()
+            }
+        )
+
+        recycler.adapter = adapter
     }
 
-    private fun updateTotal() {
+    private fun refreshData() {
+        // Обновляем список в адаптере актуальными данными из CartManager
+        val freshItems = CartManager.getItems().map { CartItem(it.book, it.quantity) }
+        adapter.items.clear()
+        adapter.items.addAll(freshItems)
+        adapter.notifyDataSetChanged()
+        updateUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // При возврате на экран обновляем данные
+        refreshData()
+    }
+
+    private fun updateUI() {
         val total = CartManager.getTotal()
-        totalPriceText.text = "Итого: %.2f BYN".format(total)
+        totalText.text = "Итого: %.2f BYN".format(total)
+
+        val isEmpty = CartManager.getItems().isEmpty()
+
+        if (isEmpty) {
+            recycler.visibility = View.GONE
+            checkoutButton.visibility = View.GONE
+            totalText.visibility = View.GONE
+            emptyText.visibility = View.VISIBLE
+        } else {
+            recycler.visibility = View.VISIBLE
+            checkoutButton.visibility = View.VISIBLE
+            totalText.visibility = View.VISIBLE
+            emptyText.visibility = View.GONE
+        }
     }
 }

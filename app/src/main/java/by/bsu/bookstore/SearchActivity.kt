@@ -1,50 +1,60 @@
 package by.bsu.bookstore
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.EditText
-import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
+import by.bsu.bookstore.repositories.BooksRepository
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : BaseActivity() {
 
-    private lateinit var inputField: TextInputEditText
-    private lateinit var searchButton: MaterialButton
-    private lateinit var recyclerView: RecyclerView
-
-    private val allBooks = listOf(
-        Book(1, "1984", listOf("Оруэлл"), "A", 300.0),
-        Book(2, "Мастер и Маргарита", listOf("Булгаков"), "B", 500.0),
-        Book(3, "Гарри Поттер", listOf("Джоан Роулинг"), "Аст", 450.0)
-    )
+    private lateinit var queryField: EditText
+    private lateinit var recycler: RecyclerView
+    private lateinit var emptyText: TextView
+    private val allBooks = BooksRepository.getAllBooks()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        inflateContent(R.layout.activity_search)
+        //setupBottomNav(R.id.nav_home)
 
-        inputField = findViewById(R.id.searchEditText)
-        searchButton = findViewById(R.id.searchButton)
-        recyclerView = findViewById(R.id.searchResultsRecyclerView)
+        queryField = findViewById(R.id.searchQueryField)
+        recycler = findViewById(R.id.searchRecycler)
+        emptyText = findViewById(R.id.searchEmptyText)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
 
-        searchButton.setOnClickListener {
-            val text = inputField.text.toString().trim()
+        findViewById<View>(R.id.searchButton).setOnClickListener {
+            performSearch()
+        }
+    }
 
-            val result = allBooks.filter { book ->
-                book.title.contains(text, ignoreCase = true) ||
-                        book.authors.any { it.contains(text, ignoreCase = true) } ||
-                        (book.publisher?.contains(text, ignoreCase = true) ?: false)
-            }
+    private fun performSearch() {
+        val q = queryField.text?.toString()?.trim()?.lowercase() ?: ""
 
-            recyclerView.adapter = BooksCarouselAdapter(result) { book ->
-                startActivity(android.content.Intent(this, BookDetailsActivity::class.java).apply {
-                    putExtra("book", book)
-                })
-            }
+        val results = allBooks.filter {
+            it.title.lowercase().contains(q) || it.authors.any { a -> a.lowercase().contains(q) }
+        }
+
+        if (results.isEmpty()) {
+            emptyText.visibility = View.VISIBLE
+            recycler.visibility = View.GONE
+        } else {
+            emptyText.visibility = View.GONE
+            recycler.visibility = View.VISIBLE
+            recycler.adapter = BooksCarouselAdapter(
+                results,
+                onDetailsClick = { book ->
+                    startActivity(Intent(this, BookDetailsActivity::class.java).putExtra("book", book))
+                },
+                onFavoriteClick = { book ->
+                    FavoritesManager.toggleFavorite(this, book)
+                    (recycler.adapter as? BooksCarouselAdapter)?.notifyDataSetChanged()
+                }
+            )
         }
     }
 }

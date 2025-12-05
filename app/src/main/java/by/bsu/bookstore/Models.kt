@@ -29,6 +29,7 @@ data class Book(
     val publisher: String? = null,
     val price: Double = 0.0,
     val description: String? = null,
+    val category: String? = null,
     val rating: Float = 0f,
     val inStock: Int = 0,
     val preorder: Boolean = false,
@@ -47,6 +48,10 @@ data class User(
     val email: String
 ) : Serializable
 
+object UserSession {
+    var currentUser: User? = null
+}
+
 data class OrderItem(val book: Book, var quantity: Int = 1)
 data class Order(
     val orderId: Int = 0,
@@ -56,3 +61,12 @@ data class Order(
     var status: String = "новый",
     val address: String
 ) : Serializable
+
+//object SampleData {
+//    val sampleBooks: List<Book> = listOf(
+//        Book(1, "1984", listOf("Джордж Оруэлл"), "АСТ", 12.5, "Антиутопия", 4.5f, coverResId = null),
+//        Book(2, "Мастер и Маргарита", listOf("М. Булгаков"), "Эксмо", 18.0, "Роман", 4.8f, coverResId = null),
+//        Book(3, "Преступление и наказание", listOf("Ф. Достоевский"), "Питер", 15.0, "Классика", 4.6f, coverResId = null)
+//    )
+//}
+
