@@ -10,7 +10,8 @@ import com.google.android.material.button.MaterialButton
 
 class BookSectionsAdapter(
     private val sections: List<BookSection>,
-    private val onAllBooksClick: (BookSection) -> Unit
+    private val onAllBooksClick: (BookSection) -> Unit,
+    private val onDetailsClick: (Book) -> Unit
 ) : RecyclerView.Adapter<BookSectionsAdapter.SectionViewHolder>() {
 
     class SectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,9 +30,14 @@ class BookSectionsAdapter(
         val section = sections[position]
         holder.titleText.text = section.title
 
-        val booksAdapter = BooksCarouselAdapter(section.books) { book ->
-            // Handle book click - navigate to book details
-        }
+        val booksAdapter = BooksCarouselAdapter(
+            section.books, 
+            onDetailsClick,
+            onFavoriteClick = { book ->
+                FavoritesManager.toggleFavorite(holder.itemView.context, book)
+                //booksAdapter.notifyDataSetChanged()
+            }
+        )
 
         holder.booksRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

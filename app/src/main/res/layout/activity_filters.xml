@@ -1,10 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FiltersActivity">
+    android:background="@color/background_color"
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ЖАНРЫ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Жанр"
+            android:textSize="18sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/genreChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.chip.Chip
+                android:text="Фантастика"
+                android:checkable="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+
+            <com.google.android.material.chip.Chip
+                android:text="Классика"
+                android:checkable="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+
+            <com.google.android.material.chip.Chip
+                android:text="Детективы"
+                android:checkable="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- АВТОРЫ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Авторы"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/text_color"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/authorsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- ИЗДАТЕЛЬСТВА -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Издательства"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/text_color"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/publishersChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- ЦЕНА -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Цена"
+            android:textSize="18sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/priceRangeSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="200"
+            android:stepSize="1"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- РЕЙТИНГ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Рейтинг"
+            android:textSize="18sp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp"/>
+
+        <RatingBar
+            android:id="@+id/ratingFilter"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:progressTint="@color/primary_color"
+            android:layout_marginBottom="20dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/applyFiltersButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Применить"
+            app:backgroundTint="@color/primary_color"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+</ScrollView>

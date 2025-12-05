@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="280dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    android:background="@color/white">
+
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:layout_marginEnd="8dp">
+    android:padding="8dp">
 
     <ImageView
         android:id="@+id/bookCover"
@@ -17,9 +25,10 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:minHeight="120dp">
 
         <TextView
             android:id="@+id/bookTitle"
@@ -28,7 +37,6 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_color"
-            android:fontFamily="sans-serif"
             android:maxLines="2"
             android:ellipsize="end" />
 
@@ -38,7 +46,6 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/text_color"
-            android:fontFamily="sans-serif"
             android:layout_marginTop="4dp"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -51,13 +58,15 @@
             android:numStars="5"
             android:stepSize="0.1"
             android:isIndicator="true"
-            android:layout_marginTop="8dp"
-            android:progressTint="@color/primary_color" />
+            android:layout_marginTop="8dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        <TextView
+            android:id="@+id/bookPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/primary_color"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,32 +79,23 @@
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
-                android:text="Купить"
+                android:text="Подробнее"
                 android:textSize="12sp"
-                android:fontFamily="sans-serif"
                 android:textColor="@color/white"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                app:backgroundTint="@color/secondary_color"
-                android:layout_marginEnd="8dp" />
+                app:backgroundTint="@color/primary_color" />
 
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/favoriteButton"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:icon="@drawable/ic_bookmark"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconSize="16dp"
-                app:iconTint="@color/white"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                app:backgroundTint="@color/secondary_color" />
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:src="@drawable/ic_bookmark" />
 
         </LinearLayout>
 
     </LinearLayout>
 
 </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

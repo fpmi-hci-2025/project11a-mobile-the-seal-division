@@ -3,122 +3,81 @@ package by.bsu.bookstore
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import by.bsu.bookstore.repositories.BooksRepository
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var promotionsViewPager: ViewPager2
-    private lateinit var sectionsRecyclerView: RecyclerView
-    private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var sectionsRecyclerView: androidx.recyclerview.widget.RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        inflateContent(R.layout.activity_main)
+        //setupBottomNav(R.id.nav_home)
 
-        initViews()
-        setupPromotions()
-        setupSections()
-        setupBottomNavigation()
-        setupToolbar()
-    }
+        val searchIcon = findViewById<ImageView>(R.id.searchIcon)
+        val filterIcon = findViewById<ImageView>(R.id.filterIcon)
+        val favoritesButton = findViewById<View>(R.id.favoritesButton)
+        val cartButton = findViewById<View>(R.id.cartButton)
 
-    private fun initViews() {
         promotionsViewPager = findViewById(R.id.promotionsViewPager)
         sectionsRecyclerView = findViewById(R.id.sectionsRecyclerView)
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-    }
 
-    private fun setupPromotions() {
-        val promotions = listOf(
-            Promotion("Скидка 20% на классику", "Только до конца месяца!"),
-            Promotion("Новинки со скидкой", "Лучшие книги 2025 года"),
-            Promotion("Бесплатная доставка", "При покупке от 2000 рублей")
-        )
-
-        val adapter = PromotionsAdapter(promotions) { promotion ->
-            showPromotionDialog(promotion)
-        }
-        promotionsViewPager.adapter = adapter
-    }
-
-    private fun setupSections() {
-        val sections = listOf(
-            BookSection("Новинки", getSampleBooks()),
-            BookSection("Классика", getSampleBooks()),
-            BookSection("Фантастика", getSampleBooks()),
-            BookSection("Детективы", getSampleBooks())
-        )
-
-        val adapter = BookSectionsAdapter(sections) { section ->
-            startActivity(Intent(this, AllBooksActivity::class.java).apply {
-                putExtra("section", section.title)
-            })
-        }
-
-        sectionsRecyclerView.layoutManager = LinearLayoutManager(this)
-        sectionsRecyclerView.adapter = adapter
-    }
-
-    private fun setupBottomNavigation() {
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> true
-                R.id.nav_favorites -> {
-                    startActivity(Intent(this, FavoritesActivity::class.java))
-                    true
-                }
-                R.id.nav_cart -> {
-                    startActivity(Intent(this, CartActivity::class.java))
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun setupToolbar() {
-        findViewById<View>(R.id.searchIcon).setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
-        }
-
-        findViewById<View>(R.id.filterIcon).setOnClickListener {
-            startActivity(Intent(this, FiltersActivity::class.java))
-        }
-
-        findViewById<View>(R.id.favoritesButton).setOnClickListener {
-            startActivity(Intent(this, FavoritesActivity::class.java))
-        }
-
-        findViewById<View>(R.id.cartButton).setOnClickListener {
-            startActivity(Intent(this, CartActivity::class.java))
-        }
+        searchIcon.setOnClickListener { startActivity(Intent(this, SearchActivity::class.java)) }
+        filterIcon.setOnClickListener { startActivity(Intent(this, FiltersActivity::class.java)) }
+        favoritesButton.setOnClickListener { startActivity(Intent(this, FavoritesActivity::class.java)) }
+        cartButton.setOnClickListener { startActivity(Intent(this, CartActivity::class.java)) }
 
         findViewById<View>(R.id.allPromotionsButton).setOnClickListener {
             startActivity(Intent(this, AllPromotionsActivity::class.java))
         }
+
+        selectNavItem(R.id.nav_home)
+
+        updateNotificationBadge()
+        setupPromotions()
+        setupSections()
     }
 
-    private fun showPromotionDialog(promotion: Promotion) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(promotion.title)
-            .setMessage(promotion.description)
-            .setPositiveButton("Закрыть", null)
-            .show()
+    private fun setupPromotions() {
+        val promotions = listOf(
+            Promotion("Скидка 20%", "На классику"),
+            Promotion("Новинки", "Лучшие книги 2025")
+        )
+
+        promotionsViewPager.adapter = PromotionsAdapter(promotions) { promo ->
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(promo.title)
+                .setMessage(promo.description)
+                .setPositiveButton("OK", null)
+                .show()
+        }
     }
 
-    private fun getSampleBooks(): List<Book> {
-        return listOf(
-            Book("1984", "Джордж Оруэлл", 4.5f),
-            Book("Мастер и Маргарита", "Михаил Булгаков", 4.8f),
-            Book("Преступление и наказание", "Федор Достоевский", 4.6f),
-            Book("Война и мир", "Лев Толстой", 4.7f),
-            Book("Гарри Поттер", "Дж. К. Роулинг", 4.9f)
+    private fun setupSections() {
+        val sections = listOf(
+            BookSection("Новинки", BooksRepository.getBooksByCategory("Новинки")),
+            BookSection("Классика", BooksRepository.getBooksByCategory("Классика"))
+        )
+
+        sectionsRecyclerView.layoutManager = LinearLayoutManager(this)
+        sectionsRecyclerView.adapter = BookSectionsAdapter(
+            sections = sections,
+            onAllBooksClick = { section ->
+                startActivity(Intent(this, AllBooksActivity::class.java).apply {
+                    putExtra("section", section.title)
+                })
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            },
+            onDetailsClick = { book ->
+                startActivity(Intent(this, BookDetailsActivity::class.java).apply {
+                    putExtra("book", book)
+                })
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            }
         )
     }
 }
