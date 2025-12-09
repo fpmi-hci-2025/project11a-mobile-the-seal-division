@@ -4,9 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.adapters.BooksCarouselAdapter
+import by.bsu.bookstore.managers.FavoritesManager
 
 class FavoritesActivity : BaseActivity() {
 
@@ -17,7 +18,6 @@ class FavoritesActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         inflateContent(R.layout.activity_favorites)
-        //setupBottomNav(R.id.nav_favorites)
         selectNavItem(R.id.nav_favorites)
 
         recycler = findViewById(R.id.favoritesRecycler)
@@ -44,7 +44,7 @@ class FavoritesActivity : BaseActivity() {
                 onDetailsClick = { book ->
                     startActivity(Intent(this, BookDetailsActivity::class.java).putExtra("book", book))
                 },
-                onFavoriteClick = { book ->
+                onFavoriteClick = { book, position ->
                     FavoritesManager.toggleFavorite(this, book)
                     updateUI()
                 }

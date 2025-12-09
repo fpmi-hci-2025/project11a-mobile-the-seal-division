@@ -1,4 +1,4 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,12 +6,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.managers.FavoritesManager
+import by.bsu.bookstore.R
+import by.bsu.bookstore.model.Book
+import by.bsu.bookstore.model.BookSection
 import com.google.android.material.button.MaterialButton
 
 class BookSectionsAdapter(
     private val sections: List<BookSection>,
     private val onAllBooksClick: (BookSection) -> Unit,
-    private val onDetailsClick: (Book) -> Unit
+    private val onDetailsClick: (Book) -> Unit,
+    private val onFavoriteClick: (book: Book, sectionPosition: Int, bookPosition: Int) -> Unit
 ) : RecyclerView.Adapter<BookSectionsAdapter.SectionViewHolder>() {
 
     class SectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -33,8 +38,10 @@ class BookSectionsAdapter(
         val booksAdapter = BooksCarouselAdapter(
             section.books, 
             onDetailsClick,
-            onFavoriteClick = { book ->
-                FavoritesManager.toggleFavorite(holder.itemView.context, book)
+            onFavoriteClick = { book, bookPosition ->
+                //FavoritesManager.toggleFavorite(holder.itemView.context, book)
+                onFavoriteClick(book, position, bookPosition)
+
                 //booksAdapter.notifyDataSetChanged()
             }
         )

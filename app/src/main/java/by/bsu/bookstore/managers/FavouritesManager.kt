@@ -1,8 +1,7 @@
-// File: app/src/main/java/by/bsu/bookstore/FavoritesManager.kt
-package by.bsu.bookstore
+package by.bsu.bookstore.managers
 
 import android.content.Context
-import android.content.SharedPreferences
+import by.bsu.bookstore.model.Book
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -23,14 +22,14 @@ object FavoritesManager {
 
     fun toggleFavorite(context: Context, book: Book) {
         if (isFavorite(book)) {
-            favorites.removeAll { it.bookId == book.bookId }
+            favorites.removeAll { it.id == book.id }
         } else {
             favorites.add(book)
         }
         save(context)
     }
 
-    fun isFavorite(book: Book): Boolean = favorites.any { it.bookId == book.bookId }
+    fun isFavorite(book: Book): Boolean = favorites.any { it.id == book.id }
     fun getFavorites(): List<Book> = favorites.toList()
 
     private fun save(context: Context) {

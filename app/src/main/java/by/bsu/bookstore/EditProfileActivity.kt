@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
+import by.bsu.bookstore.auth.AuthManager
+import by.bsu.bookstore.model.User
 import by.bsu.bookstore.repositories.UserRepository
 import com.google.android.material.snackbar.Snackbar
-import kotlin.properties.Delegates
 
 class EditProfileActivity : BaseActivity() {
 
@@ -31,7 +31,7 @@ class EditProfileActivity : BaseActivity() {
 
         val user = AuthManager.currentUserEmail()?.let { UserRepository.getUserByEmail(it) }
         if (user != null) {
-            userId = user.userId
+            userId = user.id
             firstNameEdit.setText(user.firstName)
             lastNameEdit.setText(user.lastName)
             emailEdit.setText(user.email)
@@ -52,7 +52,8 @@ class EditProfileActivity : BaseActivity() {
                     email = em,
                     firstName = fn,
                     lastName = ln
-                ))
+                )
+                )
             }
 
 //            UserSession.currentUser = User(

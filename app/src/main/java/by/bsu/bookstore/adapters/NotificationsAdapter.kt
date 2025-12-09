@@ -1,10 +1,12 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.managers.NotificationItem
+import by.bsu.bookstore.R
 
 class NotificationsAdapter(
     private val items: List<NotificationItem>,

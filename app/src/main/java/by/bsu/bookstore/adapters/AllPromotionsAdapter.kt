@@ -1,15 +1,17 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.R
+import by.bsu.bookstore.model.Promotion
 
-class PromotionsAdapter(
+class AllPromotionsAdapter(
     private val items: List<Promotion>,
     private val onClick: (Promotion) -> Unit
-) : RecyclerView.Adapter<PromotionsAdapter.PromoViewHolder>() {
+) : RecyclerView.Adapter<AllPromotionsAdapter.PromoViewHolder>() {
 
     class PromoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.promotionTitle)
@@ -18,7 +20,7 @@ class PromotionsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PromoViewHolder {
         val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_promotion, parent, false)
+            .inflate(R.layout.item_promotion_compact, parent, false)
         return PromoViewHolder(v)
     }
 

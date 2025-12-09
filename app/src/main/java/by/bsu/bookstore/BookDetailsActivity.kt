@@ -3,15 +3,27 @@ package by.bsu.bookstore
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import by.bsu.bookstore.auth.AuthManager
+import by.bsu.bookstore.managers.CartManager
+import by.bsu.bookstore.managers.FavoritesManager
+import by.bsu.bookstore.managers.NotificationsManager
+import by.bsu.bookstore.managers.ReviewManager
+import by.bsu.bookstore.managers.SubscriptionManager
+import by.bsu.bookstore.model.Book
+import by.bsu.bookstore.repositories.PublishersRepository
+import by.bsu.bookstore.repositories.UserRepository
+import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BookDetailsActivity : BaseActivity() {
 
@@ -28,11 +40,11 @@ class BookDetailsActivity : BaseActivity() {
     private lateinit var subscribeButton: MaterialButton
     private lateinit var reviewsContainer: LinearLayout
     private lateinit var addReviewButton: MaterialButton
+    private lateinit var availableDateText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inflateContent(R.layout.activity_book_details)
-        //setupBottomNav(R.id.nav_home)
 
         book = intent.getSerializableExtra("book") as? Book
 
@@ -48,82 +60,124 @@ class BookDetailsActivity : BaseActivity() {
         subscribeButton = findViewById(R.id.subscribeButton)
         reviewsContainer = findViewById(R.id.reviewsContainer)
         addReviewButton = findViewById(R.id.addReviewButton)
+        availableDateText = findViewById(R.id.detailsAvailableDate)
 
-        val b = book
-        if (b != null) {
-            cover.setImageResource(b.coverResId ?: R.drawable.book_cover)
-            titleView.text = b.title
-            authorsView.text = b.authors.joinToString(", ")
-            publisherView.text = b.publisher ?: ""
-            priceView.text = String.format("%.2f BYN", b.price)
-            descriptionView.text = b.description ?: ""
-            ratingView.rating = b.rating
+        toCartButton.setOnClickListener { handleCartAction() }
+        favoriteButton.setOnClickListener { handleFavoriteAction() }
+        subscribeButton.setOnClickListener { handleSubscribeAction() }
+        addReviewButton.setOnClickListener { handleAddReview() }
+
+        fillBookData()
+        refreshUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshUI()
+    }
+
+    private fun fillBookData() {
+        val b = book ?: return
+
+        if (!b.coverUrl.isNullOrEmpty()) {
+            Glide.with(cover.context)
+                .load(b.coverUrl)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error_loading)
+                .into(cover)
+        } else {
+            cover.setImageResource(b.defaultCover ?: R.drawable.book_cover)
         }
+        titleView.text = b.title
+        authorsView.text = b.author
+        publisherView.text = PublishersRepository.findById(b.publisherId)?.name ?: ""
+        priceView.text = String.format("%.2f BYN", b.price)
+        descriptionView.text = b.description
+        ratingView.rating = b.rating
+    }
 
-        toCartButton.setOnClickListener {
-            handleCartAction()
+    private fun handleCartAction() {
+        val b = book ?: return
+        val inCart = CartManager.getItems().any { it.book.id == b.id }
+
+        if (inCart) {
+            startActivity(Intent(this, CartActivity::class.java))
+        } else {
+            CartManager.addToCart(this, b)
+
+            val isPreorder = b.preorder && b.availabilityDate != null && b.availabilityDate.after(Date())
+            val message = if (isPreorder) {
+                "Книга добавлена в предзаказы"
+            } else {
+                "Книга добавлена в корзину"
+            }
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+            refreshCartButton()
         }
+    }
 
-        favoriteButton.setOnClickListener {
-            handleFavoriteAction()
+    private fun refreshCartButton() {
+        val b = book ?: return
+        val inCart = CartManager.getItems().any { it.book.id == b.id }
+        val isPreorder = b.preorder && b.availabilityDate != null && b.availabilityDate.after(Date())
+
+        if (inCart) {
+            toCartButton.text = "В корзине"
+            toCartButton.setBackgroundColor(resources.getColor(R.color.secondary_color))
+        } else {
+            if (isPreorder) {
+                toCartButton.text = "Предзаказать"
+                val formattedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(b.availabilityDate!!)
+                availableDateText.text = "Будет доступна: $formattedDate"
+                availableDateText.visibility = View.VISIBLE
+            } else {
+                toCartButton.text = "В корзину"
+                availableDateText.visibility = View.GONE
+            }
+            toCartButton.setBackgroundColor(resources.getColor(R.color.primary_color))
         }
+    }
 
-        subscribeButton.setOnClickListener {
-            handleSubscribeAction()
-        }
 
-        addReviewButton.setOnClickListener {
-            handleAddReview()
-        }
-
+    private fun refreshUI() {
         refreshCartButton()
         refreshFavoriteButton()
         refreshSubscribeButton()
         showReviews()
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshCartButton()
-        refreshFavoriteButton()
-    }
-
-    private fun handleCartAction() {
-        val b = book ?: return
-        val inCart = CartManager.getItems().any { it.book.bookId == b.bookId }
-        if (!inCart) {
-            CartManager.addToCart(this, b, 1)
-            toCartButton.text = "В корзине"
-            toCartButton.setBackgroundColor(resources.getColor(R.color.secondary_color))
-            //updateNotificationBadge()
-        } else {
-            startActivity(Intent(this, CartActivity::class.java))
-        }
-    }
-
     private fun handleFavoriteAction() {
         val b = book ?: return
         FavoritesManager.toggleFavorite(this, b)
+        if (FavoritesManager.isFavorite(b)){
+            favoriteButton.setIconResource(R.drawable.ic_bookmark_filled)
+        }
+        else{
+            favoriteButton.setIconResource(R.drawable.ic_bookmark)
+
+        }
+        Toast.makeText(this, if (FavoritesManager.isFavorite(b)) "Добавлено в избранное" else "Удалено из избранного", Toast.LENGTH_SHORT).show()
         refreshFavoriteButton()
     }
 
     private fun handleSubscribeAction() {
         val b = book ?: return
-        val publisher = b.publisher ?: return
+        val publisher = b.publisherId
+        val publisherName = PublishersRepository.findById(publisher)?.name ?: ""
         if (!AuthManager.isLogged()) {
             startActivity(Intent(this, LoginActivity::class.java))
             return
         }
         if (SubscriptionManager.isSubscribed(publisher)) {
-            SubscriptionManager.unsubscribe(publisher)
+            SubscriptionManager.unsubscribe(PublishersRepository.findById(publisher)!!)
             subscribeButton.text = "Подписаться на издательство"
-            Toast.makeText(this, "Отписаны от $publisher", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Отписаны от $publisherName", Toast.LENGTH_SHORT).show()
         } else {
-            SubscriptionManager.subscribe(publisher)
+            SubscriptionManager.subscribe(PublishersRepository.findById(publisher)!!)
             subscribeButton.text = "Отписаны"
-            Toast.makeText(this, "Подписаны на $publisher", Toast.LENGTH_SHORT).show()
-            NotificationsManager.addNotification("Подписка", "Вы подписались на новости издательства $publisher")
-            //updateNotificationBadge()
+            Toast.makeText(this, "Подписаны на $publisherName", Toast.LENGTH_SHORT).show()
+            NotificationsManager.addNotification("Подписка", "Вы подписались на новости издательства $publisherName")
         }
     }
 
@@ -143,8 +197,12 @@ class BookDetailsActivity : BaseActivity() {
                 val text = inputText.text?.toString()?.trim() ?: ""
                 val rating = ratingBar.rating.toInt()
                 if (text.isNotEmpty()) {
-                    ReviewManager.addReview(book!!.bookId, text, rating, AuthManager.currentUserEmail())
-                    // обновление UI
+                    AuthManager.currentUserEmail()?.let { email ->
+                        UserRepository.getUserByEmail(email)?.id?.let { userId ->
+                            ReviewManager.addReview(this, book!!.id, text, rating, userId)
+                            showReviews()
+                        }
+                    }
                 }
                 d.dismiss()
             }
@@ -155,7 +213,7 @@ class BookDetailsActivity : BaseActivity() {
     private fun showReviews() {
         reviewsContainer.removeAllViews()
         val b = book ?: return
-        val list = ReviewManager.getForBook(b.bookId)
+        val list = ReviewManager.getForBook(b.id)
         if (list.isEmpty()) {
             val tv = TextView(this)
             tv.text = "Пока нет отзывов"
@@ -169,32 +227,20 @@ class BookDetailsActivity : BaseActivity() {
             val rating = block.findViewById<RatingBar>(R.id.reviewRating)
             val text = block.findViewById<TextView>(R.id.reviewText)
             val del = block.findViewById<Button>(R.id.reviewDeleteButton)
-            author.text = r.authorEmail ?: "Аноним"
+            author.text = UserRepository.getUserById(r.userId)?.email ?: "Аноним"
             rating.rating = r.rating.toFloat()
-            text.text = r.text
+            text.text = r.comment
             val curr = AuthManager.currentUserEmail()
-            if (curr != null && curr == r.authorEmail) {
+            if (curr != null && curr == UserRepository.getUserById(r.userId)?.email) {
                 del.visibility = Button.VISIBLE
                 del.setOnClickListener {
-                    val removed = ReviewManager.removeReview(r.id, curr)
+                    val removed = ReviewManager.removeReview(this, r.id, r.userId)
                     if (removed) showReviews()
                 }
             } else {
                 del.visibility = Button.GONE
             }
             reviewsContainer.addView(block)
-        }
-    }
-
-    private fun refreshCartButton() {
-        val b = book ?: return
-        val inCart = CartManager.getItems().any { it.book.bookId == b.bookId }
-        if (inCart) {
-            toCartButton.text = "В корзине"
-            toCartButton.setBackgroundColor(resources.getColor(R.color.secondary_color))
-        } else {
-            toCartButton.text = "В корзину"
-            toCartButton.setBackgroundColor(resources.getColor(R.color.primary_color))
         }
     }
 
@@ -209,7 +255,7 @@ class BookDetailsActivity : BaseActivity() {
 
     private fun refreshSubscribeButton() {
         val b = book ?: return
-        val publisher = b.publisher ?: return
+        val publisher = b.publisherId
         if (SubscriptionManager.isSubscribed(publisher)) {
             subscribeButton.text = "Отписаться"
         } else {

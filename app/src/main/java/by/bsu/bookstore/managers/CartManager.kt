@@ -1,7 +1,8 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.managers
 
 import android.content.Context
-import android.content.SharedPreferences
+import by.bsu.bookstore.model.Book
+import by.bsu.bookstore.model.OrderItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -22,7 +23,7 @@ object CartManager {
     }
 
     fun addToCart(context: Context, book: Book, quantity: Int = 1) {
-        val existing = items.find { it.book.bookId == book.bookId && it.book.title == book.title }
+        val existing = items.find { it.book.id == book.id && it.book.title == book.title }
         if (existing != null) {
             existing.quantity += quantity
         } else {
@@ -32,7 +33,7 @@ object CartManager {
     }
 
     fun removeFromCart(context: Context, bookId: Int) {
-        items.removeAll { it.book.bookId == bookId }
+        items.removeAll { it.book.id == bookId }
         save(context)
     }
 

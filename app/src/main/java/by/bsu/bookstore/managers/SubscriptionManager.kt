@@ -1,7 +1,9 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.managers
 
 import android.content.Context
 import android.content.SharedPreferences
+import by.bsu.bookstore.model.Publisher
+import by.bsu.bookstore.repositories.PublishersRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -10,7 +12,7 @@ object SubscriptionManager {
     private const val KEY = "publishers"
     private lateinit var sp: SharedPreferences
     private val gson = Gson()
-    private var publishers: MutableSet<String> = mutableSetOf()
+    private var publishers: MutableSet<Int> = mutableSetOf()
 
     fun init(context: Context) {
         if (!this::sp.isInitialized) sp = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
@@ -23,18 +25,18 @@ object SubscriptionManager {
         }
     }
 
-    fun subscribe(publisher: String) {
-        publishers.add(publisher)
+    fun subscribe(publisher: Publisher) {
+        publishers.add(publisher.id)
         save()
     }
 
-    fun unsubscribe(publisher: String) {
-        publishers.remove(publisher)
+    fun unsubscribe(publisher: Publisher) {
+        publishers.remove(publisher.id)
         save()
     }
 
-    fun isSubscribed(publisher: String): Boolean {
-        return publishers.contains(publisher)
+    fun isSubscribed(publisher_id: Int): Boolean {
+        return publishers.contains(publisher_id)
     }
 
     private fun save() {

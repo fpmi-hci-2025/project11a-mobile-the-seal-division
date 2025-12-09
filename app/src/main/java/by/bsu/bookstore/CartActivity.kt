@@ -6,6 +6,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.adapters.CartItemAdapter
+import by.bsu.bookstore.auth.AuthManager
+import by.bsu.bookstore.managers.CartManager
+import by.bsu.bookstore.model.CartItem
 
 class CartActivity : BaseActivity() {
 
@@ -30,34 +34,33 @@ class CartActivity : BaseActivity() {
         updateUI()
 
         checkoutButton.setOnClickListener {
-            startActivity(Intent(this, CheckoutActivity::class.java))
+            if (!AuthManager.isLogged()) {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+            else startActivity(Intent(this, CheckoutActivity::class.java))
         }
     }
 
     private fun setupAdapter() {
-        // Получаем актуальные данные из CartManager
         val items = CartManager.getItems().map { CartItem(it.book, it.quantity) }.toMutableList()
 
         adapter = CartItemAdapter(
             items = items,
-            onIncrease = { cartItem ->
-                // Обновляем количество в CartManager
+            onIncrease = { cartItem : CartItem ->
                 CartManager.addToCart(this, cartItem.book, 1)
                 refreshData()
             },
-            onDecrease = { cartItem ->
+            onDecrease = { cartItem : CartItem ->
                 if (cartItem.quantity > 1) {
-                    // Уменьшаем количество
-                    CartManager.removeFromCart(this, cartItem.book.bookId)
+                    CartManager.removeFromCart(this, cartItem.book.id)
                     CartManager.addToCart(this, cartItem.book, cartItem.quantity - 1)
                 } else {
-                    // Удаляем товар
-                    CartManager.removeFromCart(this, cartItem.book.bookId)
+                    CartManager.removeFromCart(this, cartItem.book.id)
                 }
                 refreshData()
             },
-            onDelete = { cartItem ->
-                CartManager.removeFromCart(this, cartItem.book.bookId)
+            onDelete = { cartItem : CartItem ->
+                CartManager.removeFromCart(this, cartItem.book.id)
                 refreshData()
             }
         )
@@ -66,7 +69,6 @@ class CartActivity : BaseActivity() {
     }
 
     private fun refreshData() {
-        // Обновляем список в адаптере актуальными данными из CartManager
         val freshItems = CartManager.getItems().map { CartItem(it.book, it.quantity) }
         adapter.items.clear()
         adapter.items.addAll(freshItems)
@@ -76,7 +78,6 @@ class CartActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // При возврате на экран обновляем данные
         refreshData()
     }
 

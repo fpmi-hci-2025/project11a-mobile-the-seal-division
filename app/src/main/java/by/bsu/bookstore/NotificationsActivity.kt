@@ -1,14 +1,15 @@
 package by.bsu.bookstore
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.adapters.NotificationsAdapter
+import by.bsu.bookstore.managers.NotificationsManager
 
 class NotificationsActivity : BaseActivity() {
 
     private lateinit var recycler: RecyclerView
-    private val notifications = NotificationStorage.notifications()
+    private val notifications = NotificationsManager.all()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +22,6 @@ class NotificationsActivity : BaseActivity() {
             notif.read = true
         }
 
-        NotificationStorage.clearUnread()
+        NotificationsManager.clear()
     }
 }

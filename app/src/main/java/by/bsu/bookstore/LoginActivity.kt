@@ -3,9 +3,8 @@ package by.bsu.bookstore
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import by.bsu.bookstore.auth.AuthManager
 import by.bsu.bookstore.repositories.UserRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText

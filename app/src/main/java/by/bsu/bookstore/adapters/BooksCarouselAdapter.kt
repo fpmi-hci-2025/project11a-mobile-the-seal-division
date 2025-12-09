@@ -1,4 +1,4 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +8,16 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.R
+import by.bsu.bookstore.managers.FavoritesManager
+import by.bsu.bookstore.model.Book
+import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 
 class BooksCarouselAdapter(
-    private val items: List<Book>,
+    val items: List<Book>,
     private val onDetailsClick: (Book) -> Unit,
-    private val onFavoriteClick: (Book) -> Unit = {}
+    private val onFavoriteClick: (book: Book, position: Int) -> Unit
 ) : RecyclerView.Adapter<BooksCarouselAdapter.BookViewHolder>() {
 
     class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -35,11 +39,19 @@ class BooksCarouselAdapter(
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         val book = items[position]
 
-        if (book.coverResId != null) holder.cover.setImageResource(book.coverResId)
-        else holder.cover.setImageResource(R.drawable.book_cover)
+        if (!book.coverUrl.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(book.coverUrl)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error_loading)
+                .into(holder.cover)
+        } else {
+            val coverRes = book.defaultCover ?: R.drawable.book_cover
+            holder.cover.setImageResource(coverRes)
+        }
 
         holder.title.text = book.title
-        holder.author.text = book.authors.joinToString(", ")
+        holder.author.text = book.author
         holder.rating.rating = book.rating
         holder.price.text = String.format("%.2f BYN", book.price)
 
@@ -49,12 +61,12 @@ class BooksCarouselAdapter(
         }
 
         holder.favoriteButton.setOnClickListener {
-            onFavoriteClick(book)
+            onFavoriteClick(book, position)
         }
 
         val isFavorite = FavoritesManager.isFavorite(book)
         holder.favoriteButton.setImageResource(
-            if (isFavorite) R.drawable.ic_bookmark else R.drawable.ic_bookmark
+            if (isFavorite) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark
         )
         holder.favoriteButton.alpha = if (isFavorite) 1.0f else 0.5f
 
