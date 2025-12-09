@@ -1,66 +1,94 @@
 package by.bsu.bookstore.repositories
 
-import by.bsu.bookstore.User
-import java.util.Collections.max
+import by.bsu.bookstore.model.User
+import java.util.Date
 
 object UserRepository {
     val users: MutableList<User> = mutableListOf(
-        User(1, "Иван", "Иванов", "ivan@ivanov.com"),
-        User(2, "Пётр", "Петров", "petr@petrov.com"),
-        User(3, "Игорь", "Сидоров", "igor@sidorov.com")
+        User(id = 1, firstName = "Иван", lastName = "Иванов", email = "ivan@ivanov.com", regDate = Date(), password = "123123"),
+        User(id = 2, firstName = "Пётр", lastName = "Петров", email = "petr@petrov.com", regDate = Date(), password = "111111"),
+        User(id = 3, firstName = "Игорь", lastName = "Сидоров", email = "igor@sidorov.com", regDate = Date(), password = "222222"),
+        User(id = 4, firstName = "Админ", lastName = "", email = "admin@mir-knig.by", regDate = Date(), password = "123456")
     )
 
+    /**
+     * CREATE: Добавляет нового пользователя в репозиторий.
+     * Если у пользователя id = 0, присваивает ему новый уникальный id.
+     */
     fun createUser(user: User): User {
-        users.add(user)
-        return user
-    }
-
-    fun getNewId(): Int{
-        if (getAllIds().isNotEmpty()){
-            return max(getAllIds()) + 1
+        val newUser = if (user.id == 0) {
+            user.copy(id = getNewId(), regDate = Date())
+        } else {
+            user
         }
-        else return 1;
+        users.add(newUser)
+        return newUser
     }
 
+    /**
+     * Генерирует новый уникальный ID для пользователя.
+     */
+    fun getNewId(): Int {
+        val maxId = users.maxByOrNull { it.id }?.id ?: 0
+        return maxId + 1
+    }
+
+    /**
+     * READ: Находит пользователя по его ID.
+     */
     fun getUserById(id: Int): User? {
-        return users.find { it.userId == id }
+        return users.find { it.id == id }
     }
 
+    /**
+     * READ: Находит ID пользователя по его email (без учета регистра).
+     */
+    fun getIdByEmail(email: String): Int {
+        val usr = users.find { it.email.equals(email, ignoreCase = true) }
+        if (usr != null) {
+            return usr.id
+        }
+        return -1
+    }
+
+    /**
+     * READ: Находит пользователя по его email (без учета регистра).
+     */
     fun getUserByEmail(email: String): User? {
-        return users.find { it.email == email }
+        return users.find { it.email.equals(email, ignoreCase = true) }
     }
 
-    fun getAllIds(): List<Int> {
-        val ids : MutableList<Int> = mutableListOf()
-        for (u in users){
-            ids.add(u.userId)
-        }
-        return ids
-    }
-
-    fun getAllEmails(): List<String> {
-        val  emails : MutableList<String> = mutableListOf()
-        for (u in users){
-            emails.add(u.email)
-        }
-        return emails
-    }
-
+    /**
+     * READ: Возвращает список всех пользователей.
+     */
     fun getAllUsers(): List<User> {
-        return users
+        return users.toList() // Возвращаем копию для безопасности
     }
 
+    /**
+     * READ: Возвращает список всех email.
+     */
+    fun getAllEmails(): List<String> {
+        return users.map { it.email }
+    }
+
+    /**
+     * UPDATE: Обновляет существующего пользователя по его ID.
+     */
     fun updateUser(id: Int, updatedUser: User): Boolean {
-        val userIndex = users.indexOfFirst { it.userId == id }
+        val userIndex = users.indexOfFirst { it.id == id }
         if (userIndex != -1) {
-            users[userIndex] = updatedUser
+            val originalUser = users[userIndex]
+            users[userIndex] = updatedUser.copy(id = id, regDate = originalUser.regDate)
             return true
         }
         return false
     }
 
+    /**
+     * DELETE: Удаляет пользователя по его ID.
+     */
     fun deleteUser(id: Int): Boolean {
-        return users.removeIf { it.userId == id }
+        return users.removeIf { it.id == id }
     }
 }
-

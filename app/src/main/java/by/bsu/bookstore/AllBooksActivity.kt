@@ -2,9 +2,10 @@ package by.bsu.bookstore
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.adapters.BooksCarouselAdapter
+import by.bsu.bookstore.managers.FavoritesManager
 import by.bsu.bookstore.repositories.BooksRepository
 
 class AllBooksActivity : BaseActivity() {
@@ -28,7 +29,7 @@ class AllBooksActivity : BaseActivity() {
                     putExtra("book", book)
                 })
             },
-            onFavoriteClick = { book ->
+            onFavoriteClick = { book, position ->
                 FavoritesManager.toggleFavorite(this, book)
                 adapter.notifyDataSetChanged()
             }

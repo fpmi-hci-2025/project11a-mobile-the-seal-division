@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color">
+    android:background="@color/background_color"
+    android:layout_marginBottom="65dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,6 +39,8 @@
             android:textColor="@color/text_color" />
 
         <!-- Издательство -->
+
+        <!-- Рейтинг -->
         <TextView
             android:id="@+id/detailsPublisher"
             android:layout_width="match_parent"
@@ -45,7 +48,6 @@
             android:layout_marginTop="4dp"
             android:textColor="@color/text_color" />
 
-        <!-- Рейтинг -->
         <RatingBar
             android:id="@+id/detailsRating"
             style="?android:attr/ratingBarStyleSmall"
@@ -94,12 +96,21 @@
                 android:id="@+id/detailsFavoriteButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="8dp"
+                app:backgroundTint="@color/secondary_color"
                 app:icon="@drawable/ic_bookmark"
-                app:backgroundTint="@color/secondary_color" />
+                app:iconSize="30dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"/>
 
         </LinearLayout>
-
+        <TextView
+            android:id="@+id/detailsAvailableDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:visibility="gone" />
         <!-- Кнопка подписки -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/subscribeButton"

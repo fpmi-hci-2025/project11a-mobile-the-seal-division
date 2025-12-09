@@ -1,5 +1,5 @@
 // File: app/src/main/java/by/bsu/bookstore/AuthManager.kt
-package by.bsu.bookstore
+package by.bsu.bookstore.auth
 
 import android.content.Context
 import android.content.SharedPreferences

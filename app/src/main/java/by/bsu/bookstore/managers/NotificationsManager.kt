@@ -1,5 +1,4 @@
-// File: app/src/main/java/by/bsu/bookstore/NotificationsManager.kt
-package by.bsu.bookstore
+package by.bsu.bookstore.managers
 
 import android.content.Context
 import android.content.SharedPreferences

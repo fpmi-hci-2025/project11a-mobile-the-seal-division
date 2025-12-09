@@ -1,4 +1,4 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.R
+import by.bsu.bookstore.model.Order
+import by.bsu.bookstore.repositories.UserRepository
 
 class OrderAdapter(
     private val orders: List<Order>,
@@ -30,7 +33,7 @@ class OrderAdapter(
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
         holder.number.text = "Заказ №${order.orderId}"
-        holder.customer.text = "Покупатель: ${order.customer.firstName} ${order.customer.lastName}"
+        holder.customer.text = "Покупатель: ${UserRepository.getUserById(order.customerId)?.firstName} ${UserRepository.getUserById(order.customerId)?.lastName}"
         holder.address.text = "Адрес: ${order.address}"
         holder.amount.text = "Сумма: %.2f BYN".format(order.totalAmount)
         holder.status.text = "Статус: ${order.status}"
@@ -43,7 +46,6 @@ class OrderAdapter(
             onStatusChanged(order, "завершён")
         }
 
-        // subtle animation
         holder.itemView.alpha = 0f
         holder.itemView.translationY = 8f
         holder.itemView.animate().alpha(1f).translationY(0f).setDuration(200).start()

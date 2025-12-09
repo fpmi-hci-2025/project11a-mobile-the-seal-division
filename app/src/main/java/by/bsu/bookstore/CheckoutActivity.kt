@@ -2,8 +2,12 @@
 package by.bsu.bookstore
 
 import android.os.Bundle
-import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
+import by.bsu.bookstore.auth.AuthManager
+import by.bsu.bookstore.managers.CartManager
+import by.bsu.bookstore.model.Order
+import by.bsu.bookstore.model.User
+import by.bsu.bookstore.repositories.OrdersRepository
+import by.bsu.bookstore.repositories.UserRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
@@ -22,21 +26,20 @@ class CheckoutActivity : BaseActivity() {
         val payButton = findViewById<MaterialButton>(R.id.payButton)
 
         payButton.setOnClickListener {
-            // Простая валидация
             if (nameInput.text.isNullOrBlank() || cardInput.text.isNullOrBlank() || addressInput.text.isNullOrBlank()) {
                 android.widget.Toast.makeText(this, "Заполните обязательные поля", android.widget.Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // Симулируем успешную оплату
             val total = CartManager.getTotal()
-            val fakeOrder = Order(
-                orderId = (0..999999).random(),
-                customer = User(0, "Гость", "", "guest@example.com"),
+            val order = Order(
+                orderId = OrdersRepository.getNewId(),
+                customerId = UserRepository.getIdByEmail(AuthManager.currentUserEmail()!!),
                 items = CartManager.getItems(),
                 totalAmount = total,
                 status = "оплачен",
                 address = addressInput.text.toString()
             )
+            OrdersRepository.createOrder(order)
             CartManager.clear(this)
             android.widget.Toast.makeText(this, "Оплата успешна. Сумма: ${"%.2f".format(total)} BYN", android.widget.Toast.LENGTH_LONG).show()
             finish()

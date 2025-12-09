@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.bsu.bookstore.adapters.OrderAdapter
+import by.bsu.bookstore.auth.AuthManager
+import by.bsu.bookstore.managers.NotificationsManager
 import by.bsu.bookstore.repositories.OrdersRepository
 import by.bsu.bookstore.repositories.UserRepository
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileActivity : BaseActivity() {
 
@@ -25,12 +26,11 @@ class ProfileActivity : BaseActivity() {
     private lateinit var registerButton: LinearLayout
 
     private val orders = AuthManager.currentUserEmail()
-        ?.let { OrdersRepository.getOrdersByEmail(it) }
+        ?.let { OrdersRepository.getOrdersByCustomerId(UserRepository.getIdByEmail(it)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inflateContent(R.layout.activity_profile)
-        //setupBottomNav(R.id.nav_profile)
 
         userName = findViewById(R.id.profileUserName)
         userEmail = findViewById(R.id.profileUserEmail)
@@ -84,7 +84,7 @@ class ProfileActivity : BaseActivity() {
             loginButton.visibility = View.GONE
             registerButton.visibility = View.GONE
             editProfile.visibility = View.VISIBLE
-            if(NotificationStorage.notifications().isNotEmpty()){
+            if(NotificationsManager.all().isNotEmpty()){
                 notificationsButton.visibility = View.VISIBLE
             }
             else{

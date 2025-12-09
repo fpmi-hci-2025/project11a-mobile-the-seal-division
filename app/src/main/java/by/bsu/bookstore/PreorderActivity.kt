@@ -2,6 +2,8 @@ package by.bsu.bookstore
 
 import android.os.Bundle
 import android.widget.TextView
+import by.bsu.bookstore.managers.NotificationsManager
+import by.bsu.bookstore.model.Book
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
@@ -27,7 +29,7 @@ class PreorderActivity : BaseActivity() {
         val b = book
         if (b != null) {
             titleView.text = b.title
-            authorView.text = b.authors.joinToString(", ")
+            authorView.text = b.author
         }
 
         preorderButton.setOnClickListener {

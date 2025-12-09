@@ -4,9 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import by.bsu.bookstore.adapters.BookSectionsAdapter
+import by.bsu.bookstore.adapters.PromotionsAdapter
+import by.bsu.bookstore.managers.FavoritesManager
+import by.bsu.bookstore.model.BookSection
 import by.bsu.bookstore.repositories.BooksRepository
+import by.bsu.bookstore.repositories.PromotionsRepository
 
 class MainActivity : BaseActivity() {
 
@@ -42,14 +48,17 @@ class MainActivity : BaseActivity() {
         setupSections()
     }
 
-    private fun setupPromotions() {
-        val promotions = listOf(
-            Promotion("Скидка 20%", "На классику"),
-            Promotion("Новинки", "Лучшие книги 2025")
-        )
+    override fun onResume() {
+        super.onResume()
+        if (sectionsRecyclerView.adapter != null) {
+            sectionsRecyclerView.adapter!!.notifyDataSetChanged()
+        }
+    }
 
-        promotionsViewPager.adapter = PromotionsAdapter(promotions) { promo ->
-            androidx.appcompat.app.AlertDialog.Builder(this)
+    private fun setupPromotions() {
+
+        promotionsViewPager.adapter = PromotionsAdapter(PromotionsRepository.findAll()) { promo ->
+            AlertDialog.Builder(this)
                 .setTitle(promo.title)
                 .setMessage(promo.description)
                 .setPositiveButton("OK", null)
@@ -77,6 +86,10 @@ class MainActivity : BaseActivity() {
                     putExtra("book", book)
                 })
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            },
+            onFavoriteClick = { book, sectionPosition, bookPosition ->
+                FavoritesManager.toggleFavorite(this, book)
+                sectionsRecyclerView.adapter?.notifyItemChanged(sectionPosition)
             }
         )
     }

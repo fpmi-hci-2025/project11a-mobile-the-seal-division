@@ -1,7 +1,9 @@
-package by.bsu.bookstore
+package by.bsu.bookstore.api
 
+import by.bsu.bookstore.model.Book
+import by.bsu.bookstore.model.Order
+import by.bsu.bookstore.model.User
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
