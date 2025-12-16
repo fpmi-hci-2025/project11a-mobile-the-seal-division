@@ -1,22 +1,25 @@
-// File: app/src/main/java/by/bsu/bookstore/CheckoutActivity.kt
 package by.bsu.bookstore
 
 import android.os.Bundle
+import android.widget.Toast
+import by.bsu.bookstore.api.ApiClient
 import by.bsu.bookstore.auth.AuthManager
 import by.bsu.bookstore.managers.CartManager
 import by.bsu.bookstore.model.Order
-import by.bsu.bookstore.model.User
-import by.bsu.bookstore.repositories.OrdersRepository
-import by.bsu.bookstore.repositories.UserRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.*
 
 class CheckoutActivity : BaseActivity() {
+
+    private val apiService = ApiClient.apiService
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inflateContent(R.layout.activity_checkout)
-        //setupBottomNav(R.id.nav_profile)
+        selectNavItem(R.id.nav_cart)
+        updateNotificationBadge()
 
         val nameInput = findViewById<TextInputEditText>(R.id.cardNameEditText)
         val cardInput = findViewById<TextInputEditText>(R.id.cardNumberEditText)
@@ -27,22 +30,51 @@ class CheckoutActivity : BaseActivity() {
 
         payButton.setOnClickListener {
             if (nameInput.text.isNullOrBlank() || cardInput.text.isNullOrBlank() || addressInput.text.isNullOrBlank()) {
-                android.widget.Toast.makeText(this, "Заполните обязательные поля", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Заполните обязательные поля", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val total = CartManager.getTotal()
-            val order = Order(
-                orderId = OrdersRepository.getNewId(),
-                customerId = UserRepository.getIdByEmail(AuthManager.currentUserEmail()!!),
-                items = CartManager.getItems(),
-                totalAmount = total,
-                status = "оплачен",
-                address = addressInput.text.toString()
-            )
-            OrdersRepository.createOrder(order)
-            CartManager.clear(this)
-            android.widget.Toast.makeText(this, "Оплата успешна. Сумма: ${"%.2f".format(total)} BYN", android.widget.Toast.LENGTH_LONG).show()
-            finish()
+            createOrder(addressInput.text.toString())
         }
+    }
+
+    private fun createOrder(address: String) {
+        val userId = AuthManager.getCurrentUserId()
+        if (userId == null || userId == -1) {
+            Toast.makeText(this, "Ошибка аутентификации", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val order = Order(
+            userId = userId,
+            itemsString = CartManager.getItemsToString(),
+            totalAmount = CartManager.getTotal(),
+            status = "новый",
+            address = address
+        )
+
+        showLoading(true)
+        coroutineScope.launch {
+            try {
+                val createdOrder = withContext(Dispatchers.IO) {
+                    apiService.createOrder(order).execute().body()
+                }
+                if (createdOrder != null) {
+                    CartManager.clear(this@CheckoutActivity)
+                    Toast.makeText(this@CheckoutActivity, "Заказ №${createdOrder.id} успешно создан!", Toast.LENGTH_LONG).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@CheckoutActivity, "Не удалось создать заказ", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@CheckoutActivity, "Ошибка сети: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                showLoading(false)
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
     }
 }

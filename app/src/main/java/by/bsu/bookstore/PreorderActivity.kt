@@ -19,6 +19,7 @@ class PreorderActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         inflateContent(R.layout.activity_preorder)
         //setupBottomNav(R.id.nav_cart)
+        selectNavItem(R.id.nav_cart)
         book = intent.getSerializableExtra("book") as? Book
 
         titleView = findViewById(R.id.bookTitleTextView)
@@ -39,6 +40,7 @@ class PreorderActivity : BaseActivity() {
                 return@setOnClickListener
             }
             NotificationsManager.addNotification("Предзаказ", "Вы подписаны на предзаказ книги ${b?.title}")
+            updateNotificationBadge()
             finish()
         }
     }

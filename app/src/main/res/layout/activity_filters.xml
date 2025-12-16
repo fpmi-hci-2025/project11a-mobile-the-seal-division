@@ -116,14 +116,15 @@
             android:stepSize="0.5"
             android:progressTint="@color/primary_color"
             android:layout_marginBottom="20dp"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/clearFiltersButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="Сбросить фильтры"
-            app:backgroundTint="@color/secondary_color"
             android:textColor="@color/white"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:backgroundTint="@color/secondary_color" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/applyFiltersButton"

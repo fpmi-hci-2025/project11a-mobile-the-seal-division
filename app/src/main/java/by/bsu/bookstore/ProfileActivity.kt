@@ -5,13 +5,21 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.bsu.bookstore.adapters.OrderAdapter
+import by.bsu.bookstore.api.ApiClient
 import by.bsu.bookstore.auth.AuthManager
 import by.bsu.bookstore.managers.NotificationsManager
+import by.bsu.bookstore.model.Order
 import by.bsu.bookstore.repositories.OrdersRepository
-import by.bsu.bookstore.repositories.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileActivity : BaseActivity() {
 
@@ -19,14 +27,16 @@ class ProfileActivity : BaseActivity() {
     private lateinit var userEmail: TextView
     private lateinit var editProfile: LinearLayout
     private lateinit var notificationsButton: LinearLayout
+    private lateinit var notificationsButtonText: TextView
+
     private lateinit var ordersRecycler: RecyclerView
     private lateinit var emptyOrders: TextView
     private lateinit var logoutButton: View
     private lateinit var loginButton: LinearLayout
     private lateinit var registerButton: LinearLayout
-
-    private val orders = AuthManager.currentUserEmail()
-        ?.let { OrdersRepository.getOrdersByCustomerId(UserRepository.getIdByEmail(it)) }
+    private val orders: List<Order> = emptyList()
+    private val apiService = ApiClient.apiService
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +46,7 @@ class ProfileActivity : BaseActivity() {
         userEmail = findViewById(R.id.profileUserEmail)
         editProfile = findViewById(R.id.profileEditButton)
         notificationsButton = findViewById(R.id.profileNotificationsButton)
+        notificationsButtonText = findViewById(R.id.profileNotificationsButtonText)
         ordersRecycler = findViewById(R.id.profileOrdersRecycler)
         emptyOrders = findViewById(R.id.profileEmptyOrders)
         logoutButton = findViewById(R.id.profileLogoutButton)
@@ -43,8 +54,9 @@ class ProfileActivity : BaseActivity() {
         registerButton = findViewById(R.id.profileRegisterButton)
         selectNavItem(R.id.nav_profile)
         ordersRecycler.layoutManager = LinearLayoutManager(this)
+
         updateUserUI()
-        setupOrders()
+        updateNotificationBadge()
 
         editProfile.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
@@ -57,6 +69,7 @@ class ProfileActivity : BaseActivity() {
         logoutButton.setOnClickListener {
             //UserSession.currentUser = null
             AuthManager.logout()
+            updateUserUI()
             finish()
         }
 
@@ -72,14 +85,13 @@ class ProfileActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         updateUserUI()
-        setupOrders()
     }
 
     private fun updateUserUI() {
-        val user = AuthManager.currentUserEmail()?.let { UserRepository.getUserByEmail(it) }
-        if (user != null) {
-            userName.text = "${user.firstName} ${user.lastName}"
-            userEmail.text = user.email
+        val user = AuthManager.getCurrentUserId()
+        if (user != null && AuthManager.isLogged()) {
+            userName.text = "${AuthManager.getCurrentUserName()} ${AuthManager.getCurrentUserLastName()}"
+            userEmail.text = AuthManager.currentUserEmail()
             logoutButton.visibility = View.VISIBLE
             loginButton.visibility = View.GONE
             registerButton.visibility = View.GONE
@@ -90,6 +102,8 @@ class ProfileActivity : BaseActivity() {
             else{
                 notificationsButton.visibility = View.GONE
             }
+            notificationsButtonText.text = "Уведомления (${NotificationsManager.getUnreadCount()})"
+            AuthManager.getCurrentUserId()?.let { loadUserOrders(it) }
         } else {
             userName.text = "Гость"
             userEmail.text = "Авторизуйтесь"
@@ -98,43 +112,43 @@ class ProfileActivity : BaseActivity() {
             registerButton.visibility = View.VISIBLE
             editProfile.visibility = View.GONE
             notificationsButton.visibility = View.GONE
+            showOrders(emptyList())
         }
     }
 
-    private fun setupOrders() {
-        if(orders == null){
-            emptyOrders.visibility = View.VISIBLE
-            ordersRecycler.visibility = View.GONE
+    private fun loadUserOrders(userId: Int) {
+        ordersRecycler.visibility = View.INVISIBLE
+        showLoading(true)
+        coroutineScope.launch {
+            try {
+                val orders = withContext(Dispatchers.IO) {
+                    apiService.getOrdersByUserId(userId).execute().body() ?: emptyList()
+                }
+                showOrders(orders)
+            } catch (e: Exception) {
+                Toast.makeText(this@ProfileActivity, "Не удалось загрузить заказы", Toast.LENGTH_SHORT).show()
+                showOrders(emptyList())
+            } finally {
+                showLoading(false)
+            }
         }
-        else if (orders!!.isEmpty()) {
+    }
+
+    private fun showOrders(orders: List<Order>) {
+        if (orders.isEmpty()) {
             emptyOrders.visibility = View.VISIBLE
             ordersRecycler.visibility = View.GONE
         } else {
             emptyOrders.visibility = View.GONE
             ordersRecycler.visibility = View.VISIBLE
             ordersRecycler.adapter = OrderAdapter(orders) { order, newStatus ->
-                order.status = newStatus
+                // Здесь можно будет добавить вызов API для обновления статуса заказа
             }
         }
     }
 
-//    private fun setupBottomNav() {
-//        bottomNav.selectedItemId = R.id.nav_profile
-//
-//        bottomNav.setOnItemSelectedListener { item ->
-//            when (item.itemId) {
-//                R.id.nav_home -> {
-//                    startActivity(Intent(this, MainActivity::class.java)); true
-//                }
-//                R.id.nav_favorites -> {
-//                    startActivity(Intent(this, FavoritesActivity::class.java)); true
-//                }
-//                R.id.nav_cart -> {
-//                    startActivity(Intent(this, CartActivity::class.java)); true
-//                }
-//                R.id.nav_profile -> true
-//                else -> false
-//            }
-//        }
-//    }
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
+    }
 }

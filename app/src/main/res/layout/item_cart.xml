@@ -40,13 +40,31 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/cartItemPrice"
-            android:text="29 BYN"
-            android:textColor="@color/primary_color"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/cartItemPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_color"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cartItemOldPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/secondary_text_color"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:orientation="horizontal"

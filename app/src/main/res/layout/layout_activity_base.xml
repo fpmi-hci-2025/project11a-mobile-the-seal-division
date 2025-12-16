@@ -8,8 +8,26 @@
     <FrameLayout
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/loadingOverlayBase"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNavigationView" />
+        android:background="#80000000"
+        android:visibility="gone"
+        android:elevation="10dp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loadingAnimationBase"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:elevation="11dp"
+        android:visibility="gone"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loading_books" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

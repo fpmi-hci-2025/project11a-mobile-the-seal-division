@@ -9,7 +9,7 @@ import by.bsu.bookstore.managers.NotificationItem
 import by.bsu.bookstore.R
 
 class NotificationsAdapter(
-    private val items: List<NotificationItem>,
+    private val items: MutableList<NotificationItem>,
     private val onClick: (NotificationItem) -> Unit = {}
 ) : RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
 
@@ -29,6 +29,7 @@ class NotificationsAdapter(
         val notif = items[position]
         holder.title.text = notif.title
         holder.text.text = notif.text
+
         holder.unreadDot.visibility = if (notif.read) View.GONE else View.VISIBLE
 
         holder.itemView.setOnClickListener {
@@ -37,4 +38,9 @@ class NotificationsAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+    fun updateItems(newItems: List<NotificationItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 }

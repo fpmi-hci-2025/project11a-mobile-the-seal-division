@@ -1,22 +1,27 @@
 package by.bsu.bookstore
 
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import by.bsu.bookstore.managers.CartManager
 import by.bsu.bookstore.managers.FavoritesManager
 import by.bsu.bookstore.managers.FiltersManager
 import by.bsu.bookstore.managers.NotificationsManager
-import by.bsu.bookstore.managers.ReviewManager
 import by.bsu.bookstore.managers.SubscriptionManager
-import by.bsu.bookstore.model.Review
+import by.bsu.bookstore.model.Book
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
     private var navListenerEnabled = true
+    private var loadingAnimation: LottieAnimationView? = null
+    private var loadingOverlay: View? = null
 
     private val navMap = mapOf(
         R.id.nav_home to MainActivity::class.java,
@@ -32,7 +37,7 @@ abstract class BaseActivity : AppCompatActivity() {
         FavoritesManager.init(this)
         CartManager.init(this)
         NotificationsManager.init(this)
-        ReviewManager.init(this)
+        //ReviewManager.init(this)
         SubscriptionManager.init(this)
         FiltersManager.init(this)
         bottomNav = findViewById(R.id.bottomNavigationView)
@@ -68,6 +73,15 @@ abstract class BaseActivity : AppCompatActivity() {
     protected fun inflateContent(layoutRes: Int) {
         val container = findViewById<FrameLayout>(R.id.contentContainer)
         layoutInflater.inflate(layoutRes, container, true)
+        loadingAnimation = findViewById(R.id.loadingAnimationBase)
+        loadingOverlay = findViewById(R.id.loadingOverlayBase)
+
+    }
+
+    protected fun showLoading(show: Boolean) {
+        loadingAnimation?.visibility = if (show) View.VISIBLE else View.GONE
+        loadingOverlay?.visibility = if (show) View.VISIBLE else View.GONE
+        loadingOverlay?.isClickable = show
     }
 
     /**
@@ -88,9 +102,26 @@ abstract class BaseActivity : AppCompatActivity() {
      * Обновить бейдж уведомлений (если есть)
      */
     protected fun updateNotificationBadge() {
-        val count = NotificationsManager.all().count { !it.read }
+        val count = NotificationsManager.getUnreadCount()
         val badge = bottomNav.getOrCreateBadge(R.id.nav_profile)
         badge.isVisible = count > 0
         badge.number = count
+    }
+
+    fun setPriceWithDiscount(book: Book, priceView: TextView, oldPriceView: TextView) {
+        val discount = book.discountObj
+        if (discount != null && discount.percentage > 0) {
+            val oldPrice = book.price
+            val newPrice = oldPrice * (1 - discount.percentage / 100.0)
+
+            priceView.text = String.format("%.2f BYN", newPrice)
+
+            oldPriceView.visibility = View.VISIBLE
+            oldPriceView.text = String.format("%.2f BYN", oldPrice)
+            oldPriceView.paintFlags = oldPriceView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            priceView.text = String.format("%.2f BYN", book.price)
+            oldPriceView.visibility = View.GONE
+        }
     }
 }

@@ -9,4 +9,8 @@ data class SearchFilters(
     val minPrice: Float = 0f,
     val maxPrice: Float = 0f,
     val minRating: Float = 0f
-) : Serializable
+) : Serializable {
+    companion object {
+        fun empty() = SearchFilters(emptyList(), emptyList(), emptyList(), 0f, 0f, 0f)
+    }
+}

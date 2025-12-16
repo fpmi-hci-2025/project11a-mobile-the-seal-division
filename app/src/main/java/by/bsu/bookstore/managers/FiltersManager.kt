@@ -32,6 +32,15 @@ object FiltersManager {
         sp.edit().putString(KEY_FILTERS, json).apply()
     }
 
+    fun hasActiveFilters(): Boolean {
+        val filters = getFilters()
+        return filters.selectedGenres.isNotEmpty() ||
+                filters.selectedAuthors.isNotEmpty() ||
+                filters.selectedPublishers.isNotEmpty() ||
+                filters.maxPrice > 0 ||
+                filters.minRating > 0
+    }
+
     /**
      * Возвращает текущие сохраненные фильтры.
      */

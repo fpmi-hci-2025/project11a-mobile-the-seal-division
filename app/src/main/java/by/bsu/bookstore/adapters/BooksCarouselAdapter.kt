@@ -1,5 +1,6 @@
 package by.bsu.bookstore.adapters
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ class BooksCarouselAdapter(
         val author: TextView = view.findViewById(R.id.bookAuthor)
         val rating: RatingBar = view.findViewById(R.id.bookRating)
         val price: TextView = view.findViewById(R.id.bookPrice)
+        val oldPrice: TextView = view.findViewById(R.id.bookOldPrice)
         val detailsButton: MaterialButton = view.findViewById(R.id.buyButton)
         val favoriteButton: ImageButton = view.findViewById(R.id.favoriteButton)
     }
@@ -46,14 +48,14 @@ class BooksCarouselAdapter(
                 .error(R.drawable.error_loading)
                 .into(holder.cover)
         } else {
-            val coverRes = book.defaultCover ?: R.drawable.book_cover
+            val coverRes = R.drawable.book_cover
             holder.cover.setImageResource(coverRes)
         }
 
         holder.title.text = book.title
         holder.author.text = book.author
         holder.rating.rating = book.rating
-        holder.price.text = String.format("%.2f BYN", book.price)
+        setPriceWithDiscount(book, holder.price, holder.oldPrice)
 
         holder.detailsButton.text = "Подробнее"
         holder.detailsButton.setOnClickListener {
@@ -76,4 +78,21 @@ class BooksCarouselAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    private fun setPriceWithDiscount(book: Book, priceView: TextView, oldPriceView: TextView) {
+        val discount = book.discountObj
+        if (discount != null && discount.percentage > 0) {
+            val oldPrice = book.price
+            val newPrice = oldPrice * (1 - discount.percentage / 100.0)
+
+            priceView.text = String.format("%.2f BYN", newPrice)
+
+            oldPriceView.visibility = View.VISIBLE
+            oldPriceView.text = String.format("%.2f BYN", oldPrice)
+            oldPriceView.paintFlags = oldPriceView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            priceView.text = String.format("%.2f BYN", book.price)
+            oldPriceView.visibility = View.GONE
+        }
+    }
 }

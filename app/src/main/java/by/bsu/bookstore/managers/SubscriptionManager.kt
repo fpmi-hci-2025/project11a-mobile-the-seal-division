@@ -18,7 +18,7 @@ object SubscriptionManager {
         if (!this::sp.isInitialized) sp = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
         val json = sp.getString(KEY, null)
         if (!json.isNullOrEmpty()) {
-            val type = object : TypeToken<MutableSet<String>>() {}.type
+            val type = object : TypeToken<MutableSet<Int>>() {}.type
             publishers = gson.fromJson(json, type)
         } else {
             publishers = mutableSetOf()

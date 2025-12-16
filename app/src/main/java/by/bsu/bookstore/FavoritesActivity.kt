@@ -42,7 +42,7 @@ class FavoritesActivity : BaseActivity() {
             recycler.adapter = BooksCarouselAdapter(
                 favorites,
                 onDetailsClick = { book ->
-                    startActivity(Intent(this, BookDetailsActivity::class.java).putExtra("book", book))
+                    startActivity(Intent(this, BookDetailsActivity::class.java).putExtra("book_id", book.id))
                 },
                 onFavoriteClick = { book, position ->
                     FavoritesManager.toggleFavorite(this, book)

@@ -1,6 +1,9 @@
 package by.bsu.bookstore.managers
 
 import android.content.Context
+import android.graphics.Paint
+import android.view.View
+import android.widget.TextView
 import by.bsu.bookstore.model.Book
 import by.bsu.bookstore.model.OrderItem
 import com.google.gson.Gson
@@ -44,10 +47,30 @@ object CartManager {
 
     fun getItems(): List<OrderItem> = items.toList()
 
-    fun getTotal(): Double = items.sumOf { it.book.price * it.quantity }
+    fun getItemsToString(): String {
+        var strings = ""
+        for(item in items){
+            strings = strings.plus(item.book.title)
+            strings = strings.plus("\n")
+        }
+        return strings
+    }
+
+    fun getTotal(): Double = items.sumOf { getPriceWithDiscount(it.book) * it.quantity }
 
     private fun save(context: Context) {
         val sp = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         sp.edit().putString(KEY, gson.toJson(items)).apply()
+    }
+
+    private fun getPriceWithDiscount(book: Book): Double {
+        val discount = book.discountObj
+        if (discount != null && discount.percentage > 0) {
+            val oldPrice = book.price
+            val newPrice = oldPrice * (1 - discount.percentage / 100.0)
+            return newPrice
+        } else {
+            return book.price
+        }
     }
 }

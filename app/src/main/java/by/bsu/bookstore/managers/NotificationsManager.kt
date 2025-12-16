@@ -33,6 +33,7 @@ object NotificationsManager {
         list.forEach { it.read = true }
         save()
     }
+    fun getUnreadCount(): Int = list.count { !it.read }
 
     fun hasUnread(): Boolean = list.any { !it.read }
 
@@ -43,7 +44,7 @@ object NotificationsManager {
         sp.edit().putString(KEY_LIST, gson.toJson(list)).apply()
     }
 
-    fun clear() {
+    fun clearAll() {
         list.clear()
         save()
     }
