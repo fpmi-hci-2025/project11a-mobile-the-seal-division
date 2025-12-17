@@ -7,6 +7,12 @@
     android:layout_marginBottom="65dp">
 
     <LinearLayout
+        android:id="@+id/detailsContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -59,14 +65,32 @@
             android:stepSize="0.1" />
 
         <!-- Цена -->
-        <TextView
-            android:id="@+id/detailsPrice"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="@color/primary_color"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Новая (основная) цена -->
+            <TextView
+                android:id="@+id/detailsPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_color"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Старая зачеркнутая цена (по умолчанию скрыта) -->
+            <TextView
+                android:id="@+id/detailsOldPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/secondary_text_color"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <!-- Описание -->
         <TextView
@@ -149,6 +173,7 @@
         <!-- Нижняя навигация -->
 
 
+    </LinearLayout>
     </LinearLayout>
 
 </ScrollView>

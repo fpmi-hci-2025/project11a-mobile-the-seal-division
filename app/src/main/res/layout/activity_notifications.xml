@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_color"
+    android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/notificationsTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Уведомления"
-        android:textSize="26sp"
-        android:textColor="@color/text_color"
+        android:layout_alignParentTop="true"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:text="Уведомления"
+        android:textColor="@color/text_color"
+        android:textSize="26sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notificationsRecycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/clearNotificationsButton"
+        android:layout_below="@id/notificationsTitle" />
+
+    <TextView
+        android:id="@+id/emptyNotificationsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="У вас пока нет уведомлений"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/clearNotificationsButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Очистить уведомления"
+        android:layout_marginBottom="90dp"/>
+
+</RelativeLayout>

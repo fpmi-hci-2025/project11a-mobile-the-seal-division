@@ -47,6 +47,8 @@ dependencies {
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.lottie)
+    implementation(libs.bcrypt)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

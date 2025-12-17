@@ -10,29 +10,43 @@ import android.widget.LinearLayout
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.launch
+import by.bsu.bookstore.api.ApiClient.apiService
 import by.bsu.bookstore.auth.AuthManager
 import by.bsu.bookstore.managers.CartManager
 import by.bsu.bookstore.managers.FavoritesManager
 import by.bsu.bookstore.managers.NotificationsManager
-import by.bsu.bookstore.managers.ReviewManager
 import by.bsu.bookstore.managers.SubscriptionManager
 import by.bsu.bookstore.model.Book
-import by.bsu.bookstore.repositories.PublishersRepository
-import by.bsu.bookstore.repositories.UserRepository
+import by.bsu.bookstore.model.Review
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
+import java.util.UUID
 
 class BookDetailsActivity : BaseActivity() {
 
     private var book: Book? = null
+    private var bookId: Int = -1
+
+    private lateinit var contentContainer: LinearLayout
     private lateinit var cover: ImageView
     private lateinit var titleView: TextView
     private lateinit var authorsView: TextView
     private lateinit var publisherView: TextView
     private lateinit var priceView: TextView
+    private lateinit var oldPriceView: TextView
     private lateinit var descriptionView: TextView
     private lateinit var ratingView: RatingBar
     private lateinit var toCartButton: MaterialButton
@@ -41,18 +55,25 @@ class BookDetailsActivity : BaseActivity() {
     private lateinit var reviewsContainer: LinearLayout
     private lateinit var addReviewButton: MaterialButton
     private lateinit var availableDateText: TextView
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inflateContent(R.layout.activity_book_details)
 
-        book = intent.getSerializableExtra("book") as? Book
-
+        bookId = intent.getIntExtra("book_id", -1)
+        if (bookId == -1) {
+            Toast.makeText(this, "Ошибка: ID книги не найден", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        contentContainer = findViewById(R.id.detailsContentContainer)
         cover = findViewById(R.id.detailsCover)
         titleView = findViewById(R.id.detailsTitle)
         authorsView = findViewById(R.id.detailsAuthors)
         publisherView = findViewById(R.id.detailsPublisher)
         priceView = findViewById(R.id.detailsPrice)
+        oldPriceView = findViewById(R.id.detailsOldPrice)
         descriptionView = findViewById(R.id.detailsDescription)
         ratingView = findViewById(R.id.detailsRating)
         toCartButton = findViewById(R.id.detailsBuyButton)
@@ -67,8 +88,46 @@ class BookDetailsActivity : BaseActivity() {
         subscribeButton.setOnClickListener { handleSubscribeAction() }
         addReviewButton.setOnClickListener { handleAddReview() }
 
-        fillBookData()
-        refreshUI()
+        selectNavItem(R.id.nav_home)
+        loadBookDetails()
+        updateNotificationBadge()
+
+        //fillBookData()
+        //refreshUI()
+    }
+
+    private fun loadBookDetails() {
+        showData(false) // Скрываем контент
+        showLoading(true) // Показываем загрузку
+
+        coroutineScope.launch {
+            try {
+                // Параллельно загружаем книгу и ее отзывы
+                val bookDeferred = async(Dispatchers.IO) { apiService.getBook(bookId).execute().body() }
+                val reviewsDeferred = async(Dispatchers.IO) { apiService.getReviewsByBookId(bookId).execute().body() }
+
+                val loadedBook = bookDeferred.await()
+                val loadedReviews = reviewsDeferred.await()
+
+                if (loadedBook != null) {
+                    book = loadedBook
+                    fillBookData()
+                    showReviews(loadedReviews ?: emptyList())
+                    refreshUI()
+                    showData(true)
+                } else {
+                    Toast.makeText(this@BookDetailsActivity, "Не удалось загрузить информацию о книге", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@BookDetailsActivity, "Ошибка сети: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                showLoading(false)
+            }
+        }
+    }
+
+    private fun showData(show: Boolean) {
+        contentContainer.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
     override fun onResume() {
@@ -86,14 +145,15 @@ class BookDetailsActivity : BaseActivity() {
                 .error(R.drawable.error_loading)
                 .into(cover)
         } else {
-            cover.setImageResource(b.defaultCover ?: R.drawable.book_cover)
+            cover.setImageResource(R.drawable.book_cover)
         }
         titleView.text = b.title
         authorsView.text = b.author
-        publisherView.text = PublishersRepository.findById(b.publisherId)?.name ?: ""
-        priceView.text = String.format("%.2f BYN", b.price)
+        publisherView.text = b.publisherName
+        setPriceWithDiscount(b, priceView, oldPriceView)
         descriptionView.text = b.description
         ratingView.rating = b.rating
+
     }
 
     private fun handleCartAction() {
@@ -104,23 +164,38 @@ class BookDetailsActivity : BaseActivity() {
             startActivity(Intent(this, CartActivity::class.java))
         } else {
             CartManager.addToCart(this, b)
+            val message = "Книга добавлена в корзину"
 
-            val isPreorder = b.preorder && b.availabilityDate != null && b.availabilityDate.after(Date())
-            val message = if (isPreorder) {
-                "Книга добавлена в предзаказы"
-            } else {
-                "Книга добавлена в корзину"
-            }
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
             refreshCartButton()
         }
     }
+    private fun parseDate(dateString: String): Date {
+        val formats = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "dd.MM.yyyy"
+        )
+
+        for (format in formats) {
+            try {
+                val sdf = SimpleDateFormat(format, Locale.getDefault())
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                return sdf.parse(dateString) ?: Date()
+            } catch (e: Exception) {
+            }
+        }
+
+        return Date()
+    }
 
     private fun refreshCartButton() {
         val b = book ?: return
         val inCart = CartManager.getItems().any { it.book.id == b.id }
-        val isPreorder = b.preorder && b.availabilityDate != null && b.availabilityDate.after(Date())
+        val isPreorder = b.preorder && b.availableDate != null && parseDate(b.availableDate).after(Date())
 
         if (inCart) {
             toCartButton.text = "В корзине"
@@ -128,7 +203,7 @@ class BookDetailsActivity : BaseActivity() {
         } else {
             if (isPreorder) {
                 toCartButton.text = "Предзаказать"
-                val formattedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(b.availabilityDate!!)
+                val formattedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(parseDate(b.availableDate!!))
                 availableDateText.text = "Будет доступна: $formattedDate"
                 availableDateText.visibility = View.VISIBLE
             } else {
@@ -144,7 +219,6 @@ class BookDetailsActivity : BaseActivity() {
         refreshCartButton()
         refreshFavoriteButton()
         refreshSubscribeButton()
-        showReviews()
     }
 
     private fun handleFavoriteAction() {
@@ -163,21 +237,23 @@ class BookDetailsActivity : BaseActivity() {
 
     private fun handleSubscribeAction() {
         val b = book ?: return
-        val publisher = b.publisherId
-        val publisherName = PublishersRepository.findById(publisher)?.name ?: ""
+        val publisher = b.publisherObj
+        val publisherId = b.publisherId
+        val publisherName = b.publisherName
         if (!AuthManager.isLogged()) {
             startActivity(Intent(this, LoginActivity::class.java))
             return
         }
-        if (SubscriptionManager.isSubscribed(publisher)) {
-            SubscriptionManager.unsubscribe(PublishersRepository.findById(publisher)!!)
+        if (SubscriptionManager.isSubscribed(publisherId)) {
+            SubscriptionManager.unsubscribe(publisher!!)
             subscribeButton.text = "Подписаться на издательство"
             Toast.makeText(this, "Отписаны от $publisherName", Toast.LENGTH_SHORT).show()
         } else {
-            SubscriptionManager.subscribe(PublishersRepository.findById(publisher)!!)
-            subscribeButton.text = "Отписаны"
+            SubscriptionManager.subscribe(publisher!!)
+            subscribeButton.text = "Отписаться"
             Toast.makeText(this, "Подписаны на $publisherName", Toast.LENGTH_SHORT).show()
             NotificationsManager.addNotification("Подписка", "Вы подписались на новости издательства $publisherName")
+            updateNotificationBadge()
         }
     }
 
@@ -188,19 +264,36 @@ class BookDetailsActivity : BaseActivity() {
         }
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_review, null)
         val inputText = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputReviewText)
-        val ratingBar = dialogView.findViewById<android.widget.RatingBar>(R.id.inputReviewRating)
+        val ratingBar = dialogView.findViewById<RatingBar>(R.id.inputReviewRating)
 
         val dlg = androidx.appcompat.app.AlertDialog.Builder(this)
             .setView(dialogView)
             .setTitle("Оставить отзыв")
             .setPositiveButton("Добавить") { d, _ ->
                 val text = inputText.text?.toString()?.trim() ?: ""
-                val rating = ratingBar.rating.toInt()
+                val rating = ratingBar.rating.toInt().toString()
                 if (text.isNotEmpty()) {
-                    AuthManager.currentUserEmail()?.let { email ->
-                        UserRepository.getUserByEmail(email)?.id?.let { userId ->
-                            ReviewManager.addReview(this, book!!.id, text, rating, userId)
-                            showReviews()
+                    AuthManager.getCurrentUserId()?.let { userId ->
+                            coroutineScope.launch {
+                                showLoading(true)
+                                try {
+                                    val newReview = Review(bookId = book!!.id, comment = text, rating = rating, userId = userId)
+                                    val addedReview = withContext(Dispatchers.IO) {
+                                        apiService.addReview(book!!.id, newReview).execute().body()
+                                    }
+                                    if (addedReview != null) {
+                                        val updatedReviews = withContext(Dispatchers.IO) { apiService.getReviewsByBookId(bookId).execute().body() }
+                                        showReviews(updatedReviews ?: emptyList())
+                                    }
+                                    else{
+                                        Toast.makeText(this@BookDetailsActivity, "Не удалось добавить отзыв", Toast.LENGTH_SHORT).show()
+                                    }
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@BookDetailsActivity, "Ошибка. Не удалось добавить отзыв", Toast.LENGTH_SHORT).show()
+                                }
+                                finally {
+                                    showLoading(false)
+                                }
                         }
                     }
                 }
@@ -210,10 +303,8 @@ class BookDetailsActivity : BaseActivity() {
         dlg.show()
     }
 
-    private fun showReviews() {
+    private fun showReviews(list: List<Review>) {
         reviewsContainer.removeAllViews()
-        val b = book ?: return
-        val list = ReviewManager.getForBook(b.id)
         if (list.isEmpty()) {
             val tv = TextView(this)
             tv.text = "Пока нет отзывов"
@@ -227,15 +318,28 @@ class BookDetailsActivity : BaseActivity() {
             val rating = block.findViewById<RatingBar>(R.id.reviewRating)
             val text = block.findViewById<TextView>(R.id.reviewText)
             val del = block.findViewById<Button>(R.id.reviewDeleteButton)
-            author.text = UserRepository.getUserById(r.userId)?.email ?: "Аноним"
+            author.text = r.userObj?.email ?: "Аноним"
             rating.rating = r.rating.toFloat()
             text.text = r.comment
             val curr = AuthManager.currentUserEmail()
-            if (curr != null && curr == UserRepository.getUserById(r.userId)?.email) {
+            if (curr != null && curr == r.userObj?.email) {
                 del.visibility = Button.VISIBLE
                 del.setOnClickListener {
-                    val removed = ReviewManager.removeReview(this, r.id, r.userId)
-                    if (removed) showReviews()
+                    coroutineScope.launch {
+                        showLoading(true)
+                        try {
+                            val response = withContext(Dispatchers.IO) { apiService.deleteReview(r.id!!).execute() }
+                            if (response.isSuccessful) {
+                                val updatedReviews = withContext(Dispatchers.IO) { apiService.getReviewsByBookId(bookId).execute().body() }
+                                showReviews(updatedReviews ?: emptyList())
+                                Toast.makeText(this@BookDetailsActivity, "Отзыв удален", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(this@BookDetailsActivity, "Ошибка удаления", Toast.LENGTH_SHORT).show()
+                        } finally {
+                            showLoading(false)
+                        }
+                    }
                 }
             } else {
                 del.visibility = Button.GONE
@@ -261,5 +365,10 @@ class BookDetailsActivity : BaseActivity() {
         } else {
             subscribeButton.text = "Подписаться на издательство"
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
     }
 }

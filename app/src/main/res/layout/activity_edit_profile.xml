@@ -45,13 +45,30 @@
             android:textColor="@color/text_color"/>
 
         <EditText
+            android:id="@+id/editPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Телефон"
+            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/text_color"/>
+
+        <EditText
+            android:id="@+id/editAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Адрес"
+            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/text_color"/>
+
+        <TextView
             android:id="@+id/editEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
             android:padding="12dp"
             android:layout_marginTop="12dp"
-            android:inputType="textEmailAddress"
             android:textColor="@color/text_color"/>
 
         <Button

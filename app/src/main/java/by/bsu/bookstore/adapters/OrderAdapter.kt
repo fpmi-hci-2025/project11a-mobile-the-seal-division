@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import by.bsu.bookstore.R
 import by.bsu.bookstore.model.Order
-import by.bsu.bookstore.repositories.UserRepository
 
 class OrderAdapter(
     private val orders: List<Order>,
@@ -32,11 +31,38 @@ class OrderAdapter(
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
-        holder.number.text = "Заказ №${order.orderId}"
-        holder.customer.text = "Покупатель: ${UserRepository.getUserById(order.customerId)?.firstName} ${UserRepository.getUserById(order.customerId)?.lastName}"
+
+        holder.number.text = "Заказ №${order.id}"
+
+        val customerName = if (order.userObj != null) {
+            "${order.userObj.firstName} ${order.userObj.lastName}"
+        } else {
+            "Пользователь #${order.userId}"
+        }
+        holder.customer.text = "Покупатель: $customerName"
+
         holder.address.text = "Адрес: ${order.address}"
         holder.amount.text = "Сумма: %.2f BYN".format(order.totalAmount)
         holder.status.text = "Статус: ${order.status}"
+
+        when (order.status.lowercase()) {
+            "новый" -> {
+                holder.btnProcess.isEnabled = true
+                holder.btnComplete.isEnabled = false
+            }
+            "в обработке" -> {
+                holder.btnProcess.isEnabled = false
+                holder.btnComplete.isEnabled = true
+            }
+            "завершён" -> {
+                holder.btnProcess.isEnabled = false
+                holder.btnComplete.isEnabled = false
+            }
+            else -> {
+                holder.btnProcess.isEnabled = true
+                holder.btnComplete.isEnabled = true
+            }
+        }
 
         holder.btnProcess.setOnClickListener {
             onStatusChanged(order, "в обработке")
@@ -46,9 +72,15 @@ class OrderAdapter(
             onStatusChanged(order, "завершён")
         }
 
+        // Анимация
         holder.itemView.alpha = 0f
         holder.itemView.translationY = 8f
-        holder.itemView.animate().alpha(1f).translationY(0f).setDuration(200).start()
+        holder.itemView.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(200)
+            .setStartDelay(position * 30L)
+            .start()
     }
 
     override fun getItemCount(): Int = orders.size

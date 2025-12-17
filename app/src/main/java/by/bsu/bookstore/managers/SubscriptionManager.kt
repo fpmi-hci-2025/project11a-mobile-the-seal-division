@@ -3,7 +3,6 @@ package by.bsu.bookstore.managers
 import android.content.Context
 import android.content.SharedPreferences
 import by.bsu.bookstore.model.Publisher
-import by.bsu.bookstore.repositories.PublishersRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -18,7 +17,7 @@ object SubscriptionManager {
         if (!this::sp.isInitialized) sp = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
         val json = sp.getString(KEY, null)
         if (!json.isNullOrEmpty()) {
-            val type = object : TypeToken<MutableSet<String>>() {}.type
+            val type = object : TypeToken<MutableSet<Int>>() {}.type
             publishers = gson.fromJson(json, type)
         } else {
             publishers = mutableSetOf()

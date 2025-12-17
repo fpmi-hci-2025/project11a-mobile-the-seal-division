@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import by.bsu.bookstore.R
-import by.bsu.bookstore.model.Promotion
+import by.bsu.bookstore.model.Discount
 
 class PromotionsAdapter(
-    private val items: List<Promotion>,
-    private val onClick: (Promotion) -> Unit
+    private val items: List<Discount>,
+    private val onClick: (Discount) -> Unit
 ) : RecyclerView.Adapter<PromotionsAdapter.PromoViewHolder>() {
 
     class PromoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
