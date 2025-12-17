@@ -26,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Имя на карте"
+            app:placeholderText="NAME LASTNAME"
             app:boxBackgroundColor="@color/white"
             app:boxCornerRadiusTopStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
@@ -44,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Номер карты"
+            app:placeholderText="0000 0000 0000 0000"
             android:layout_marginTop="16dp"
             app:boxBackgroundColor="@color/white"
             app:boxCornerRadiusTopStart="8dp"
@@ -53,9 +55,11 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/cardNumberEditText"
+                android:maxLength="19"
+                android:digits="0123456789 "
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Поле срока действия карты -->
@@ -70,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Срок действия"
+                app:placeholderText="MM/YY"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
@@ -78,9 +83,12 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cardExpiryEditText"
+                    android:maxLength="5"
+                    android:digits="0123456789/"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="date" />
+                    android:inputType="text" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -89,6 +97,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="16dp"
                 android:hint="CVV"
+                app:placeholderText="CVV"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
@@ -97,9 +106,10 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cardCvvEditText"
+                    android:maxLength="3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
+                    android:inputType="numberPassword" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

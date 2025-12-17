@@ -13,7 +13,6 @@ import by.bsu.bookstore.api.ApiClient
 import by.bsu.bookstore.auth.AuthManager
 import by.bsu.bookstore.managers.NotificationsManager
 import by.bsu.bookstore.model.Order
-import by.bsu.bookstore.repositories.OrdersRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

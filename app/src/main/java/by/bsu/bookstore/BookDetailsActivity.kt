@@ -19,7 +19,6 @@ import by.bsu.bookstore.managers.NotificationsManager
 import by.bsu.bookstore.managers.SubscriptionManager
 import by.bsu.bookstore.model.Book
 import by.bsu.bookstore.model.Review
-import by.bsu.bookstore.repositories.PublishersRepository
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope

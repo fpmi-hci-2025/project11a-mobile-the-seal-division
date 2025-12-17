@@ -16,7 +16,6 @@ import by.bsu.bookstore.managers.FavoritesManager
 import by.bsu.bookstore.managers.FiltersManager
 import by.bsu.bookstore.model.Book
 import by.bsu.bookstore.model.SearchFilters
-import by.bsu.bookstore.repositories.PublishersRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

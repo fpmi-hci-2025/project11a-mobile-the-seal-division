@@ -3,7 +3,6 @@ package by.bsu.bookstore.managers
 import android.content.Context
 import android.content.SharedPreferences
 import by.bsu.bookstore.model.Publisher
-import by.bsu.bookstore.repositories.PublishersRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
