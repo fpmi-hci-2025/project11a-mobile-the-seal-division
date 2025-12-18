@@ -35,7 +35,10 @@
         android:layout_height="80dp"
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_navigation"
-        app:itemIconTint="@color/white"
+        app:itemIconTint="@color/ic_books_background"
+        app:itemRippleColor="@color/white"
+        app:itemActiveIndicatorStyle="@color/background_color"
+        app:itemPaddingBottom="10dp"
         app:itemTextColor="@color/white"
         app:backgroundTint="@color/primary_color"/>
 
