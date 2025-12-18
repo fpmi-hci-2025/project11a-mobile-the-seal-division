@@ -27,24 +27,6 @@
             android:layout_height="wrap_content"
             app:singleSelection="false"
             android:layout_marginBottom="20dp">
-
-            <com.google.android.material.chip.Chip
-                android:text="Фантастика"
-                android:checkable="true"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>
-
-            <com.google.android.material.chip.Chip
-                android:text="Классика"
-                android:checkable="true"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>
-
-            <com.google.android.material.chip.Chip
-                android:text="Детективы"
-                android:checkable="true"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>
         </com.google.android.material.chip.ChipGroup>
 
         <!-- АВТОРЫ -->
