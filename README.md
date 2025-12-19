@@ -3,7 +3,7 @@
 Этот репозиторий содержит мобильное приложение "Книжный онлайн-магазин" для платформы **Android**.
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blue.svg)](https://kotlinlang.org)
-[![API](https://img.shields.io/badge/API-29%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=329)
+[![API](https://img.shields.io/badge/API-29%2B-brightgreen.svg?style=flat)](https://developer.android.com/tools/releases/platform-tools)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ Основные возможности
